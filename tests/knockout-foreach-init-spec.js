@@ -156,6 +156,23 @@ describe("foreachInit binding", function () {
     $template.remove();
   });
 
+  it("can create array elements using callback", function () {
+    var target = $("<ul data-bind='foreachInit: { data: $data.cities, createElement: createCity }'>" +
+                        "<li data-bind='text: name' data-template></li>" +
+                        "<li data-bind='textInit: name' data-init>London</li>" +
+                        "<li data-bind='textInit: name' data-init>Paris</li>" +
+                        "<li data-bind='textInit: name' data-init>Amsterdam</li>" +
+                      "</ul>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal(target.html(), '<li data-bind="textInit: name" data-init="">London</li>' + 
+                                  '<li data-bind="textInit: name" data-init="">Paris</li>' +
+                                  '<li data-bind="textInit: name" data-init="">Amsterdam</li>');
+      assert.strictEqual(model.cities()[0].name(), 'London');
+      assert.strictEqual(model.cities()[1].name(), 'Paris');
+      assert.strictEqual(model.cities()[2].name(), 'Amsterdam');
+  });
+
   describe("observable array changes", function () {
     setupSynchronousFrameAnimation();
     var div, obs, view;
@@ -306,7 +323,6 @@ describe("foreachInit binding", function () {
       toggle(false);
       assert.equal(target.text(), "123456");
     });
-
   });
 
   describe("combined with nested initializers", function () {
@@ -318,7 +334,7 @@ describe("foreachInit binding", function () {
       model.push(new CityViewModel());
       model.push(new CityViewModel());
       model.push(new CityViewModel());
-    });    
+    }); 
 
     it("works with textInit", function () {
       var target = $("<ul data-bind='foreachInit: $data'>" +
@@ -368,5 +384,4 @@ describe("foreachInit binding", function () {
       assert.strictEqual(model()[2].name(), 'Amsterdam');
     }); 
   });
-})
-
+});

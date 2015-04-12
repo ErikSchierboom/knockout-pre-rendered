@@ -18,4 +18,7 @@ function ViewModel() {
     }
   });
   self.year = ko.observable(0);
+  self.createCity = function() {
+    return new CityViewModel();
+  };
 }
