@@ -7,7 +7,7 @@ var gulp = require('gulp'),
 // from https://github.com/ikari-pl/gulp-tag-version
 function inc(importance) {
   console.log(" ----  >>>  Don't forget: $ git push --tag");
-  return gulp.src(['./package.json' ])
+  return gulp.src(['./package.json', './bower.json'])
     .pipe(plugins.bump({type: importance}))
     .pipe(gulp.dest('./'))
     .pipe(plugins.git.commit('bumps package version'))

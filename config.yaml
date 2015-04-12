@@ -29,12 +29,12 @@ footer: |
 webserver:
   port: 4054
   directoryListing: true
-  open: spec/runner.html
+  open: tests/runner.html
   livereload:
     enable: true
     port: 4055
 
 watch:
   index.js
-  spec/*
+  tests/*
   config.yaml
