@@ -104,6 +104,13 @@ function InitializedForeach(spec) {
     return child && child.attributes && child.attributes['data-init'];
   });
 
+  // Check to see if we should manually create the array elements
+  if (typeof spec.createElement === 'function') {
+    ko.utils.arrayForEach(this.existingElements, function(existingElement) {
+      self.data.push(spec.createElement());
+    });
+  }
+
   // Prime content
   var primeData = ko.unwrap(this.data);
   if (primeData.map) {
@@ -282,7 +289,8 @@ ko.bindingHandlers.foreachInit = {
       initializedForeach = new InitializedForeach({
         element: element,
         data: ko.unwrap(context.$rawData) === value ? context.$rawData : value,
-        $context: context
+        $context: context,
+        createElement: value.createElement
       });
     }
 

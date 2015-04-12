@@ -29,7 +29,7 @@ footer: |
 webserver:
   port: 4054
   directoryListing: true
-  open: tests/runner.html
+  open: test/runner.html
   livereload:
     enable: true
     port: 4055
