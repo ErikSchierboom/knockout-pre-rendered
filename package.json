@@ -1,6 +1,6 @@
 {
   "name": "knockout-pre-rendered",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Knockout pre-rendered",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "javascript"
   ],
   "author": "Erik Schierboom",
-  "license": "MIT",
+  "license": "Apache",
   "bugs": {
     "url": "https://github.com/ErikSchierboom/knockout-pre-rendered/issues"
   },
