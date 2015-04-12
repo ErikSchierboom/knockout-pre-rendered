@@ -7,7 +7,8 @@ var gulp = require('gulp'),
 function updateVersion(importance) {
   console.log(" ----  >>>  Don't forget: $ git push --tag");
   return gulp.src(['./package.json', './bower.json'])
-    .pipe(plugins.bump({type: importance}));
+    .pipe(plugins.bump({type: importance}))
+    .pipe(gulp.dest('./'))
 }
 
 gulp.task('patch', function() { return updateVersion('patch'); })
