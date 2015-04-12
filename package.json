@@ -1,6 +1,6 @@
 {
   "name": "knockout-pre-rendered",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Knockout pre-rendered",
   "main": "index.js",
   "scripts": {

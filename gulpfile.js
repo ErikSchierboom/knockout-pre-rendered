@@ -4,22 +4,15 @@ var gulp = require('gulp'),
     config = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8')),
     plugins = require('gulp-load-plugins')();
 
-// from https://github.com/ikari-pl/gulp-tag-version
-function inc(importance) {
+function updateVersion(importance) {
   console.log(" ----  >>>  Don't forget: $ git push --tag");
   return gulp.src(['./package.json', './bower.json'])
-    .pipe(plugins.bump({type: importance}))
-    .pipe(gulp.dest('./'))
-    .pipe(plugins.git.commit('bumps package version'))
-    .pipe(plugins.filter('package.json'))
-    // .pipe(plugins.tagVersion());
-    // FIXME
-    // See https://github.com/ikari-pl/gulp-tag-version/issues/4
+    .pipe(plugins.bump({type: importance}));
 }
 
-gulp.task('patch', function() { return inc('patch'); })
-gulp.task('feature', function() { return inc('minor'); })
-gulp.task('release', function() { return inc('major'); })
+gulp.task('patch', function() { return updateVersion('patch'); })
+gulp.task('feature', function() { return updateVersion('minor'); })
+gulp.task('release', function() { return updateVersion('major'); })
 
 gulp.task('webserver', function () {
   return gulp.src('.')
