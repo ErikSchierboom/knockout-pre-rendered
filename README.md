@@ -1,5 +1,8 @@
 # Knockout pre-rendered binding handlers
 
+[![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered) 
+[![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
+
 This library adds four new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
 
 - `textInit`: wraps the [`text` binding](http://knockoutjs.com/documentation/text-binding.html), with the observable initialized to the `innerText` attribute of the HTML element it is bound to.
