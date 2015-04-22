@@ -3,14 +3,12 @@
 [![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered) 
 [![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
 
-This library adds four new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
+This library adds two new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
 
-- `textInit`: wraps the [`text` binding](http://knockoutjs.com/documentation/text-binding.html), with the observable initialized to the `innerText` attribute of the HTML element it is bound to.
-- `valueInit`: wraps the [`value` binding](http://knockoutjs.com/documentation/value-binding.html), with the observable initialized to the `value` attribute of the HTML `<input>` element it is bound to.
+- `init`: initialize an observable to a value retrieved from existing HTML content.
 - `foreachInit`: wraps the [`foreach` binding](http://knockoutjs.com/documentation/foreach-binding.html), with the observable array's elements bound to existing HTML elements.
-- `init`: initialize an observable to a specific value.
 
-## Binding #1: textInit  
+## Init binding
 
 Suppose we have the following view model:
 
@@ -26,21 +24,30 @@ Normally, you'd bind the `name` observable to an HTML element as follows:
 <span data-bind="text: name">Michael Jordan</span>
 ```
 
-Once the bindings have been applied however, the text within the `<span>` element will be cleared, as the bound observable did not have a value. 
+Once the binding has been applied however, the text within the `<span>` element will be cleared, as the bound observable did not have a value (existing HTML content is ignored). 
 
-If we use the `textInit` binding handler, first the observable's value will be set to the `innerText` value of the bound element. Then the `text` binding is applied. 
+We can fix this by specifying the `init` binding handler *before* the `text` binding handler:
 
 ```html
-<span data-bind="textInit: name">Michael Jordan</span>
+<span data-bind="init, text: name">Michael Jordan</span>
 ```
 
-Now, the text within the `<span>` element is left unchanged.
+Now, the text within the `<span>` element is left unchanged. This is due to the `init` binding handler setting the observable's value to the text content of the bound element. As Knockout binding handlers are executed left-to-right, when the `text` binding executes the `init` binding will already have initialized the observable.
 
-### Converting 
-By default, the `textInit` binding will set the observable's value to a string  . If you want to convert to a different type, you can specify a convert function:
+You can combine the `init` handler with any binding, as long as you ensure that it is listed before the other bindings:
 
 ```html
-<span data-bind="textInit: { field: height, convert: parseInt }">198</span>
+<span data-bind="init, textInput: name">Michael Jordan</span>
+
+<!-- This binding will use the "value" attribute to initialize the observable -->
+<input data-bind="init, value: name" value="Larry Bird" type="text" />
+```
+
+### Converting 
+By default, the `init` binding will set the observable's value to a string. If you want to convert to a different type, you can specify a convert function:
+
+```html
+<span data-bind="init: { convert: parseInt }, text: height">198</span>
 ```
 
 Now, the observable's value will be set to what the `convert` function, with the `innerText` value as its parameter, returns.
@@ -62,24 +69,39 @@ function CustomConvertViewModel() {
 You can then use this custom convert function as follows:
 
 ```html
-<span data-bind="textInit: { field: dateOfBirth, convert: parseDate }">
+<span data-bind="init: { convert: parseDate }, text: dateOfBirth">
 ```
 
-## Binding #2: valueInit
+### Virtual elements
 
-The `valueInit` binding is similar to the `textInit` binding, but acts as a wrapper over the `value` binding instead of the `text` binding:
+You can also use the `init` binding handler as a virtual element:
 
 ```html
-<input data-bind="valueInit: name" value="Michael Jordan" type="text" />
+<!-- ko init: { field: name } -->Michael Jordan<!-- /ko -->
 ```
 
-Converting works in the exact same way:
+Converting works the same as before:
 
 ```html
-<input data-bind="valueInit: { field: height, convert: parseInt }" value="198" type="text" />
+<!-- ko init: { field: height, convert: parseInt } -->198<!-- /ko -->
 ```
 
-## Binding #3: foreachInit
+Note that we now need to explicitly specify the `field` parameter, which points to the observable to initialize. In our previous examples, the `init` binding was able to infer this due to it being combined with the `text`, `textInput` or `value` binding and using the observable they were pointing to. As a consequence, the following bindings are equivalent:
+
+```html
+<span data-bind="init, text: name">Michael Jordan</span>
+<span data-bind="init: { field: name }, text: name">Michael Jordan</span>
+```
+
+Although you'd probably not need it, you could have the `init` handler initialize a different observable than the one `text`, `textInput` or `value` binding uses:
+
+```html
+<span data-bind="init: { field: name }, text: year">Michael Jordan</span>
+```
+
+The result of this binding is that the `name` observable will have its value initialized to `"Michael Jordan"`, after which the element will be bound to the `year` observable.
+
+## Foreach init binding
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:
 
 ```javascript
@@ -101,9 +123,9 @@ We can bind the elements in the `persons` observable array to existing HTML elem
 ```html
 <ul data-bind="foreachInit: persons">
   <li data-template data-bind="text: name"></li>
-  <li data-init data-bind="textInit: name">Michael Jordan</li>
-  <li data-init data-bind="textInit: name">Larry Bird</li>
-  <li data-init data-bind="textInit: name">Magic Johnson</li>
+  <li data-init data-bind="init, text: name">Michael Jordan</li>
+  <li data-init data-bind="init, text: name">Larry Bird</li>
+  <li data-init data-bind="init, text: name">Magic Johnson</li>
 </ul>
 ```
 
@@ -111,16 +133,16 @@ There are several things to note:
 
 1. There must be one child element with the `data-template` attribute. This element will be used as the template when new items are added to the array.
 2. Elements to be bound to array items must have the `data-init` attribute.
-3. You can use the `textInit` and `valueInit` binding handlers to initialize the array items themselves.
+3. You can use the `init` binding handler to initialize the array items themselves.
 
 ### Template
 You can also use a template that is defined elsewhere on the page:
 
 ```html
 <ul data-bind="foreachInit: { name: 'personTemplate', data: persons }">  
-  <li data-init data-bind="textInit: name">Michael Jordan</li>
-  <li data-init data-bind="textInit: name">Larry Bird</li>
-  <li data-init data-bind="textInit: name">Magic Johnson</li>
+  <li data-init data-bind="init, text: name">Michael Jordan</li>
+  <li data-init data-bind="init, text: name">Larry Bird</li>
+  <li data-init data-bind="init, text: name">Magic Johnson</li>
 </ul>
 
 <script type="text/ko-template" id="personTemplate">
@@ -151,37 +173,14 @@ We can use the `foreachInit` binding handler as follows:
 ```html
 <ul data-bind="foreachInit: { name: 'personTemplate', createElement: addPerson }">  
   <li data-template data-bind="text: name"></li>
-  <li data-init data-bind="textInit: name">Michael Jordan</li>
-  <li data-init data-bind="textInit: name">Larry Bird</li>
-  <li data-init data-bind="textInit: name">Magic Johnson</li>
+  <li data-init data-bind="init, text: name">Michael Jordan</li>
+  <li data-init data-bind="init, text: name">Larry Bird</li>
+  <li data-init data-bind="init, text: name">Magic Johnson</li>
 </ul>
 ```
 
 What happens is that for each element with the `data-init` attribute, the function specified in the `createElement` parameter is called.
 
-## Binding #4: init
-
-This binding handler initializes an observable to a value. It is only really useful if you use one of the previous binding handlers and want to completely initialize your view model from HTML.
-
-You can apply it to an element as follows:
-
-```html
-<span data-bind="init: name">Michael Jordan</span>
-```
-
-Although this initializes the `name` observable to `"Michael Jordan"`, note that the element's text is not bound to the observable. For that, you should use the `textInit` binding.
-
-Therefore it usually makes more sense to use the `init` binding handler as a virtual element:
-
-```html
-<!-- ko init: { field: name } -->Michael Jordan<!-- /ko -->
-```
-
-Converting works similar to the `textInit` and `valueInit` bindings:
-
-```html
-<!-- ko init: { field: height, convert: parseInt } -->198<!-- /ko -->
-```
 
 ## Installation
 The best way to install this library is using [Bower](http://bower.io/):
@@ -191,9 +190,9 @@ The best way to install this library is using [Bower](http://bower.io/):
 ## Demos
 There is a JSBin demo for each of the binding handlers:
 
-- [`textInit` binding](http://jsbin.com/jazeke)
-- [`valueInit` binding](http://jsbin.com/xuluye/)
 - [`foreachInit` binding](http://jsbin.com/nocaro)
+- [`init with text` binding](http://jsbin.com/jazeke)
+- [`init with value` binding](http://jsbin.com/xuluye/)
 - [`init` binding](http://jsbin.com/wikaji/)
 
 ## History
@@ -202,6 +201,11 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2014-04-22</td>
+     <td>0.3.0</td>
+     <td>Combined textInit, valueInit and init binding handlers into single init binding.</td>
   </tr>
   <tr>
      <td>2014-04-13</td>

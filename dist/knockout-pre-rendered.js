@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.1.0
+  Knockout pre-rendered binding handlers v0.3.0
   By: Erik Schierboom (C) 2015
   License: MIT
 
@@ -307,68 +307,37 @@ ko.bindingHandlers.foreachInit = {
 
 ko.virtualElements.allowedBindings.foreachInit = true;
 
-// This binding handler is similar to the "text" binding handler, with the only 
-// difference being that the bound value is initialized using the element's "innerText" 
-// HTML property
-ko.bindingHandlers.textInit = {
-    init: function (element, valueAccessor) {
-        var value = valueAccessor(), 
-            unwrappedValue = ko.utils.peekObservable(value);
-
-        var fieldValue = element.innerText;
-        
-        // If a convert function was passed, apply it to the field value.
-        // This can be used to convert the input string to the correct field value
-        if (typeof value['convert'] === 'function') {
-            fieldValue = value['convert'](fieldValue);
-        }
-        
-        var fieldAccessor = value['field'] || value;
-        fieldAccessor(fieldValue, unwrappedValue);
-
-        ko.applyBindingsToNode(element, { 'text': fieldAccessor });
-    }
-};
-
-// This binding handler is similar to the "value" binding handler, with the only 
-// difference being that the bound value is initialized using the element's "value" 
-// HTML attribute      
-ko.bindingHandlers.valueInit = {
-    init: function (element, valueAccessor) {
-        var value = valueAccessor(), 
-            unwrappedValue = ko.utils.peekObservable(value);
-
-        var fieldValue = element.value;
-        
-        // If a convert function was passed, apply it to the field value.
-        // This can be used to convert the input string to the correct field value
-        if (typeof value['convert'] === 'function') {
-            fieldValue = value['convert'](fieldValue);
-        }
-        
-        var fieldAccessor = value['field'] || value;
-        fieldAccessor(fieldValue, unwrappedValue);
-
-        ko.applyBindingsToNode(element, { 'value': fieldAccessor });
-    }
-};
-
-// This binding handler initializes the bound value to the specified value.
+// This binding handler initializes an observable to a value from the HTML element
 ko.bindingHandlers.init = {
-    init: function (element, valueAccessor) {
+    init: function (element, valueAccessor, allBindings) {
         var value = valueAccessor(), 
             unwrappedValue = ko.utils.peekObservable(value);
         
+        // Determine the element from which to retrieve the value
         var valueElement = isVirtualNode(element) ? ko.virtualElements.firstChild(element) : element;
-        var fieldValue = value['val'] || valueElement.innerText || valueElement.value || valueElement.textContent;
+
+        // Get the actual value from the element. If the binding handler does not
+        // have an explicit value, try to retrieve it from the value of inner text content
+        var fieldValue = (value ? value['val'] : undefined) || 
+                          valueElement.innerText ||  
+                          valueElement.textContent ||
+                          valueElement.value;
         
         // If a convert function was passed, apply it to the field value.
         // This can be used to convert the input string to the correct field value
-        if (typeof value['convert'] === 'function') {
+        if (value && typeof value['convert'] === 'function') {
             fieldValue = value['convert'](fieldValue);
         }
 
-        var fieldAccessor = value['field'] || value;
+        // Find the field accessor. If the init binding does not point to an observable
+        // or the field parameter doesn't, we try the text and value binding
+        var fieldAccessor = (ko.isObservable(value) ? value : undefined) || 
+                            (value ? value['field'] : undefined) ||                             
+                             allBindings.get('text') ||
+                             allBindings.get('textInput') ||
+                             allBindings.get('value');
+
+        // Finally, update the observable with the value
         fieldAccessor(fieldValue, unwrappedValue);
     }
 };

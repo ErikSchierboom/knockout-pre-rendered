@@ -6,7 +6,6 @@ var gulp = require('gulp'),
     plugins = require('gulp-load-plugins')();
 
 function updateVersion(importance) {
-  console.log(" ----  >>>  Don't forget: $ git push --tag");
   return gulp.src(['./package.json', './bower.json'])
     .pipe(plugins.bump({type: importance}))
     .pipe(gulp.dest('./'));
