@@ -1,6 +1,6 @@
 header: |
   /*!
-    Knockout pre-rendered binding handlers v0.3.0
+    Knockout pre-rendered binding handlers v{{ version }}
     By: Erik Schierboom (C) 2015
     License: MIT
 
