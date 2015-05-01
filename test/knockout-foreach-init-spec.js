@@ -115,21 +115,21 @@ describe("foreachInit binding", function () {
   });
 
   it("uses the name/id of a <template>", function () {
-    var target = $("<ul data-bind='foreachInit: {name: \"tID\", data: $data}'>" +
-                      "<li data-bind='text: $data' data-init></li>" +
-                      "<li data-bind='text: $data' data-init></li>" +
+    var target = $("<ul data-bind='foreachInit: { name: \"tID\", data: $data }'>" +
+                      "<li data-bind='text: $data'></li>" +
+                      "<li data-bind='text: $data'></li>" +
                     "</ul>");
     var list = ['F1', 'F2'];
     var $template = $("<template id='tID'><li data-bind='text: $data' data-template></li><!--/ko--></template>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    assert.equal(target.html(), '<li data-bind="text: $data" data-init="">F1</li>' + 
-                                '<li data-bind="text: $data" data-init="">F2</li>');
+    assert.equal(target.html(), '<li data-bind="text: $data">F1</li>' + 
+                                '<li data-bind="text: $data">F2</li>');
     $template.remove();
   });
 
   it("uses the name/id of a <script>", function () {
-    var target = $("<ul data-bind='foreachInit: {name: \"tID\", data: $data}'>" +
+    var target = $("<ul data-bind='foreachInit: { name: \"tID\", data: $data }'>" +
                       "<li data-bind='text: $data' data-init></li>" +
                       "<li data-bind='text: $data' data-init></li>" +
                     "</ul>");
@@ -143,7 +143,7 @@ describe("foreachInit binding", function () {
   });
 
   it("uses the name/id of a <div>", function () {
-    var target = $("<ul data-bind='foreachInit: {name: \"tID2\", data: $data}'>" +
+    var target = $("<ul data-bind='foreachInit: { name: \"tID2\", data: $data }'>" +
                       "<li data-bind='text: $data' data-init></li>" +
                       "<li data-bind='text: $data' data-init></li>" +
                     "</ul>");
@@ -153,6 +153,34 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     assert.equal(target.html(), '<li data-bind="text: $data" data-init="">H1</li>' + 
                                 '<li data-bind="text: $data" data-init="">H2</li>');
+    $template.remove();
+  });
+
+  it("does not require data-template attribute if named template is used", function () {
+    var target = $("<ul data-bind='foreachInit: { name: \"tID\", data: $data }'>" +
+                      "<li data-bind='text: $data'></li>" +
+                      "<li data-bind='text: $data'></li>" +
+                    "</ul>");
+    var list = ['F1', 'F2'];
+    var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
+      .appendTo(document.body)
+    ko.applyBindings(list, target[0]);
+    assert.equal(target.html(), '<li data-bind="text: $data">F1</li>' + 
+                                '<li data-bind="text: $data">F2</li>');
+    $template.remove();
+  });
+
+  it("does not require data-init attribute if named template is used", function () {
+    var target = $("<ul data-bind='foreachInit: { name: \"tID\", data: $data }'>" +
+                      "<li data-bind='text: $data'></li>" +
+                      "<li data-bind='text: $data'></li>" +
+                    "</ul>");
+    var list = ['F1', 'F2'];
+    var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
+      .appendTo(document.body)
+    ko.applyBindings(list, target[0]);
+    assert.equal(target.html(), '<li data-bind="text: $data">F1</li>' + 
+                                '<li data-bind="text: $data">F2</li>');
     $template.remove();
   });
 

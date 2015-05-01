@@ -142,15 +142,17 @@ You can also use a template that is defined elsewhere on the page:
 
 ```html
 <ul data-bind="foreachInit: { name: 'personTemplate', data: persons }">  
-  <li data-init data-bind="init, text: name">Michael Jordan</li>
-  <li data-init data-bind="init, text: name">Larry Bird</li>
-  <li data-init data-bind="init, text: name">Magic Johnson</li>
+  <li data-bind="init, text: name">Michael Jordan</li>
+  <li data-bind="init, text: name">Larry Bird</li>
+  <li data-bind="init, text: name">Magic Johnson</li>
 </ul>
 
 <script type="text/ko-template" id="personTemplate">
-  <li data-template data-bind="text: name"></li>
+  <li data-bind="text: name"></li>
 </script>
 ```
+
+Note: if you use a named template, the `data-init` and `data-template` can be omitted.
 
 ### Create missing array elements
 
@@ -173,7 +175,7 @@ Note that the `persons` observable array does not contain any elements, but that
 We can use the `foreachInit` binding handler as follows:
 
 ```html
-<ul data-bind="foreachInit: { name: 'personTemplate', createElement: addPerson }">  
+<ul data-bind="foreachInit: { data: persons, createElement: addPerson }">  
   <li data-template data-bind="text: name"></li>
   <li data-init data-bind="init, text: name">Michael Jordan</li>
   <li data-init data-bind="init, text: name">Larry Bird</li>

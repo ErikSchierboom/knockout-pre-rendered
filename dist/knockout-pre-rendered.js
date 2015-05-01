@@ -41,34 +41,62 @@ function isVirtualNode(node) {
   return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
 }
 
+// Find the first children of the specified parent node. If the attribute is defined, the child
+// also need to have that attribute
+function findFirstChild(parentNode, attribute) {
+  return ko.utils.arrayFirst(ko.virtualElements.childNodes(parentNode), function (child) {
+    if (typeof (attribute) === 'string') {
+      return child && child.attributes && child.attributes[attribute];  
+    }
+
+    return child;    
+  });
+}
+
+// Find children of the specified parent node. If the attribute is defined, the children
+// also need to have that attribute
+function findChildren(parentNode, attribute) {
+  return ko.utils.arrayFilter(ko.virtualElements.childNodes(parentNode), function (child) {
+    if (typeof (attribute) === 'string') {
+      return child && child.attributes && child.attributes[attribute];  
+    }
+
+    return child;    
+  });
+}
 
 // Get a copy of the template node of the given element,
 // put them into a container, then remove the template node.
 function makeTemplateNode(sourceNode) {
-  var container = document.createElement("div");
+  var container = document.createElement('div');
   var parentNode;
+  var namedTemplate;
+
   if (sourceNode.content) {
     // For e.g. <template> tags
     parentNode = sourceNode.content;
+    namedTemplate = true;
   } else if (sourceNode.tagName === 'SCRIPT') {
-    parentNode = document.createElement("div");
+    parentNode = document.createElement('div');
     parentNode.innerHTML = sourceNode.text;
+    namedTemplate = true;
   } else {
     // Anything else e.g. <div>
     parentNode = sourceNode;
+    namedTemplate = false;
   }
 
-  // Find the first element with the attribute 'data-template'
-  var template = ko.utils.arrayFirst(ko.virtualElements.childNodes(parentNode), function (child) {
-    return child && child.attributes && child.attributes['data-template'];
-  });
-
+  // Find the template and add it to the container
+  var template = findFirstChild(parentNode, namedTemplate ? null : 'data-template');
   container.insertBefore(template.cloneNode(true), null);
 
   // Remove the template node
   ko.removeNode(template);
 
-  return container;
+  return { 
+    node: container,
+    namedTemplate: namedTemplate
+  };
 }
 
 // Add an existing element
@@ -100,9 +128,7 @@ function InitializedForeach(spec) {
   this.rendering_queued = false;
 
   // Find the existing elements that will be bound to the data array
-  this.existingElements = ko.utils.arrayFilter(ko.virtualElements.childNodes(this.container), function (child) {
-    return child && child.attributes && child.attributes['data-init'];
-  });
+  this.existingElements = findChildren(this.container, this.templateNode.namedTemplate ? null : 'data-init');
 
   // Check to see if we should manually create the array elements
   if (typeof spec.createElement === 'function') {
@@ -148,15 +174,19 @@ InitializedForeach.prototype.onArrayChange = function (changeSet) {
     existing: [],
     deleted: [],
   };
+
   ko.utils.arrayForEach(changeSet, function(changeItem) {
     changeMap[changeItem.status].push(changeItem);
   });
+
   if (changeMap.deleted.length > 0) {
     this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
     this.changeQueue.push({status: 'clearDeletedIndexes'})
   }
+
   this.changeQueue.push.apply(this.changeQueue, changeMap.existing);
   this.changeQueue.push.apply(this.changeQueue, changeMap.added);
+
   // Once a change is registered, the ticking count-down starts for the processQueue.
   if (this.changeQueue.length > 0 && !this.rendering_queued) {
     this.rendering_queued = true;
@@ -209,7 +239,7 @@ InitializedForeach.prototype.existing = function (index, value) {
 // Process a changeItem with {status: 'added', ...}
 InitializedForeach.prototype.added = function (index, value) {
   var referenceElement = this.lastNodesList[index - 1] || null;
-  var templateClone = this.templateNode.cloneNode(true);
+  var templateClone = this.templateNode.node.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
   var childContext;
  
@@ -240,6 +270,7 @@ InitializedForeach.prototype.deleted = function (index, value) {
       // We use this.element because that will be the last previous node
       // for virtual element lists.
       lastNode = this.lastNodesList[index - 1] || this.element;
+
   do {
     ptr = ptr.previousSibling;
     ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
@@ -260,6 +291,7 @@ InitializedForeach.prototype.clearDeletedIndexes = function () {
   for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
     this.lastNodesList.splice(this.indexesToDelete[i], 1);
   }
+
   this.indexesToDelete = [];
 };
 
