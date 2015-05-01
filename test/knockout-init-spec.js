@@ -58,6 +58,14 @@ describe("init binding", function () {
     assert.equal($(target).val(), 'London');
     assert.strictEqual(model.city(), 'London');
   });
+  
+  it("works with val attribute that is false", function () {
+    var target = $("<input data-bind='init: { field: visited, val: false }' type='text' value='London' />");
+    var model = new ViewModel();
+    ko.applyBindings(model, target[0]);
+    assert.equal($(target).val(), 'London');
+    assert.strictEqual(model.visited(), false);
+  });
 
   it("works with convert attribute", function () {
     var target = $("<input data-bind='init: { field: year, convert: parseInt }' type='text' value='230' />");
@@ -111,7 +119,7 @@ describe("init binding", function () {
     assert.strictEqual(model.city(), 'London');
   });
 
-  it("allows init to work on with different observable", function () {
+  it("works with different field than text binding", function () {
     var target = $("<span data-bind='init: { field: city }, text: year'>London</span>");
     var model = new ViewModel();
     ko.applyBindings(model, target[0]);

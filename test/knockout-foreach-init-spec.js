@@ -338,7 +338,7 @@ describe("foreachInit binding", function () {
 
     it("works with init", function () {
       var target = $("<div data-bind='foreachInit: $data'>" +
-                        "<input data-bind='value: name' data-template></em>" +
+                        "<input data-bind='value: name' data-template>" +
                         "<input data-bind='init: name' data-init type='text' value='London' />" +
                         "<input data-bind='init: name' data-init type='text' value='Paris' />" +
                         "<input data-bind='init: name' data-init type='text' value='Amsterdam' />" +
@@ -347,6 +347,22 @@ describe("foreachInit binding", function () {
       assert.equal(target.html(), '<input data-bind="init: name" data-init="" type="text" value="London">' +
                                   '<input data-bind="init: name" data-init="" type="text" value="Paris">' +
                                   '<input data-bind="init: name" data-init="" type="text" value="Amsterdam">');
+      assert.strictEqual(model()[0].name(), 'London');
+      assert.strictEqual(model()[1].name(), 'Paris');
+      assert.strictEqual(model()[2].name(), 'Amsterdam');
+    }); 
+
+    it("works with nested init", function () {
+      var target = $("<ul data-bind='foreachInit: $data'>" +
+                        "<li data-template><input data-bind='value: name'></li>" +
+                        "<li data-init><input data-bind='init: name' type='text' value='London' /></li>" +
+                        "<li data-init><input data-bind='init: name' type='text' value='Paris' /></li>" +
+                        "<li data-init><input data-bind='init: name' type='text' value='Amsterdam' /></li>" +
+                      "</ul>");
+      ko.applyBindings(model, target[0]);
+      assert.equal(target.html(), '<li data-init=""><input data-bind="init: name" type="text" value="London"></li>' +
+                                  '<li data-init=""><input data-bind="init: name" type="text" value="Paris"></li>' +
+                                  '<li data-init=""><input data-bind="init: name" type="text" value="Amsterdam"></li>');
       assert.strictEqual(model()[0].name(), 'London');
       assert.strictEqual(model()[1].name(), 'Paris');
       assert.strictEqual(model()[2].name(), 'Amsterdam');
@@ -370,7 +386,7 @@ describe("foreachInit binding", function () {
 
     it("works with init and value", function () {
       var target = $("<div data-bind='foreachInit: $data'>" +
-                        "<input data-bind='value: name' data-template></em>" +
+                        "<input data-bind='value: name' data-template>" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='London' />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='Paris' />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='Amsterdam' />" +
@@ -379,6 +395,22 @@ describe("foreachInit binding", function () {
       assert.equal(target.html(), '<input data-bind="init: name, value: name" data-init="" type="text" value="London">' +
                                   '<input data-bind="init: name, value: name" data-init="" type="text" value="Paris">' +
                                   '<input data-bind="init: name, value: name" data-init="" type="text" value="Amsterdam">');
+      assert.strictEqual(model()[0].name(), 'London');
+      assert.strictEqual(model()[1].name(), 'Paris');
+      assert.strictEqual(model()[2].name(), 'Amsterdam');
+    }); 
+
+    it("works with init and nested virtual element", function () {
+      var target = $("<ul data-bind='foreachInit: $data'>" +
+                        "<li data-template></li>" +
+                        "<li data-init><!-- ko init: { field: name } -->London<!--/ko--></li>" +
+                        "<li data-init><!-- ko init: { field: name } -->Paris<!--/ko--></li>" +
+                        "<li data-init><!-- ko init: { field: name } -->Amsterdam<!--/ko--></li>" +
+                      "</ul>");
+      ko.applyBindings(model, target[0]);
+      assert.equal(target.html(), '<li data-init=""><!-- ko init: { field: name } -->London<!--/ko--></li>' +
+                                  '<li data-init=""><!-- ko init: { field: name } -->Paris<!--/ko--></li>' +
+                                  '<li data-init=""><!-- ko init: { field: name } -->Amsterdam<!--/ko--></li>');
       assert.strictEqual(model()[0].name(), 'London');
       assert.strictEqual(model()[1].name(), 'Paris');
       assert.strictEqual(model()[2].name(), 'Amsterdam');

@@ -295,14 +295,14 @@ ko.bindingHandlers.init = {
 
         // Get the actual value from the element. If the binding handler does not
         // have an explicit value, try to retrieve it from the value of inner text content
-        var fieldValue = (value ? value['val'] : undefined) || 
-                          valueElement.innerText ||  
+        var fieldValue = (value !== undefined && value['val'] !== undefined) ? value['val'] : 
+                         (valueElement.innerText ||  
                           valueElement.textContent ||
-                          valueElement.value;
+                          valueElement.value);
         
         // If a convert function was passed, apply it to the field value.
         // This can be used to convert the input string to the correct field value
-        if (value && typeof value['convert'] === 'function') {
+        if (value !== undefined && typeof value['convert'] === 'function') {
             fieldValue = value['convert'](fieldValue);
         }
 

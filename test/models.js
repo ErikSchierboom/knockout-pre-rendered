@@ -18,6 +18,8 @@ function ViewModel() {
     }
   });
   self.year = ko.observable(0);
+  self.visited = ko.observable(false);
+
   self.createCity = function() {
     return new CityViewModel();
   };
