@@ -52,7 +52,7 @@ describe("init binding", function () {
   });
 
   it("works with val attribute", function () {
-    var target = $("<input data-bind='init: { field: city, val: \"London\" }' type='text' value='London' />");
+    var target = $("<input data-bind='init: { field: city, value: \"London\" }' type='text' value='London' />");
     var model = new ViewModel();
     ko.applyBindings(model, target[0]);
     assert.equal($(target).val(), 'London');
@@ -60,7 +60,7 @@ describe("init binding", function () {
   });
   
   it("works with val attribute that is false", function () {
-    var target = $("<input data-bind='init: { field: visited, val: false }' type='text' value='London' />");
+    var target = $("<input data-bind='init: { field: visited, value: false }' type='text' value='London' />");
     var model = new ViewModel();
     ko.applyBindings(model, target[0]);
     assert.equal($(target).val(), 'London');
@@ -113,7 +113,7 @@ describe("init binding", function () {
   });
 
   it("works with virtual element with val attribute", function () {
-    var target = $("<!-- ko init: { field: city, val: \"London\" } --><!--/ko-->");
+    var target = $("<!-- ko init: { field: city, value: \"London\" } --><!--/ko-->");
     var model = new ViewModel();
     ko.applyBindings(model, target[0]);
     assert.strictEqual(model.city(), 'London');

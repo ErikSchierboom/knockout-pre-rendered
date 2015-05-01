@@ -69,7 +69,7 @@ function CustomConvertViewModel() {
 You can then use this custom convert function as follows:
 
 ```html
-<span data-bind="init: { convert: parseDate }, text: dateOfBirth">
+<span data-bind="init: { convert: parseDate }, text: dateOfBirth">February 17, 1963</span>
 ```
 
 ### Virtual elements
@@ -93,13 +93,15 @@ Note that we now need to explicitly specify the `field` parameter, which points 
 <span data-bind="init: { field: name }, text: name">Michael Jordan</span>
 ```
 
-Although you'd probably not need it, you could have the `init` handler initialize a different observable than the one `text`, `textInput` or `value` binding uses:
+### Explicit value
+
+If you provide a `value` parameter to the `init` binding, that value will be used to initialize the observable instead:
 
 ```html
-<span data-bind="init: { field: name }, text: year">Michael Jordan</span>
+<span data-bind="init: { field: name, value: 'Larry Bird' }, text: name">Michael Jordan</span>
 ```
 
-The result of this binding is that the `name` observable will have its value initialized to `"Michael Jordan"`, after which the element will be bound to the `year` observable.
+This would result in the observable's value being set to `"Larry Bird"`, and thus the element's content is changed once the `text` binding is applied.
 
 ## Foreach init binding
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:

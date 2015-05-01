@@ -318,7 +318,7 @@ ko.bindingHandlers.init = {
 
         // Get the actual value from the element. If the binding handler does not
         // have an explicit value, try to retrieve it from the value of inner text content
-        var fieldValue = (value !== undefined && value['val'] !== undefined) ? value['val'] : 
+        var fieldValue = (value !== undefined && value['value'] !== undefined) ? value['value'] : 
                          (valueElement.innerText ||  
                           valueElement.textContent ||
                           valueElement.value);
