@@ -128,6 +128,15 @@ describe("init binding", function () {
     assert.strictEqual(model.year(), 0);
   });
 
+  it("allows multiple fields to be initialized", function () {
+    var target = $("<span data-bind='init: { city: \"London\", year: 230 }'></span>");
+    var model = new ViewModel();
+    ko.applyBindings(model, target[0]);
+    assert.equal($(target).html(), '');
+    assert.strictEqual(model.city(), 'London');
+    assert.strictEqual(model.year(), 230);
+  });
+
   describe("combined with text binding", function () {
     it("works with an observable", function () {
       var target = $("<span data-bind='init, text: city'>London</span>");

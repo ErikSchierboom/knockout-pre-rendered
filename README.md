@@ -103,6 +103,18 @@ If you provide a `value` parameter to the `init` binding, that value will be use
 
 This would result in the observable's value being set to `"Larry Bird"`, and thus the element's content is changed once the `text` binding is applied.
 
+### Multiple values
+
+If you want to initialize multiple observable's at once, you just specify them as key/value pairs:
+
+```html
+<span data-bind="init: { city: 'London', year: 230 }"></span>
+```
+
+This would set the `city` observable to `"London"` and the `year` observable to `230`.
+
+Note: the keys cannot be equal to the `"value"`, `"convert"` or `"field"` strings.
+
 ## Foreach init binding
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:
 

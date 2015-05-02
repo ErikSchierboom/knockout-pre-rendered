@@ -23,7 +23,7 @@ gulp.task('webserver', function () {
 
 gulp.task('test', function () {
   return gulp
-    .src('test/runner.html')
+    .src('spec/runner.html')
     .pipe(mochaPhantomJS());
 });
 

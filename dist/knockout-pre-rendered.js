@@ -309,7 +309,7 @@ ko.bindingHandlers.foreachInit = {
   //    ko.observableArray([])
   //    ko.computed
   //    {data: array, name: string, as: string}
-  init: function init(element, valueAccessor, bindings, vm, context) {
+  init: function init(element, valueAccessor, bindings, viewModel, context) {
     var value = valueAccessor(),
         initializedForeach;
     
@@ -341,36 +341,53 @@ ko.virtualElements.allowedBindings.foreachInit = true;
 
 // This binding handler initializes an observable to a value from the HTML element
 ko.bindingHandlers.init = {
-    init: function (element, valueAccessor, allBindings) {
+    init: function (element, valueAccessor, allBindings, viewModel) {
         var value = valueAccessor(), 
             unwrappedValue = ko.utils.peekObservable(value);
         
-        // Determine the element from which to retrieve the value
-        var valueElement = isVirtualNode(element) ? ko.virtualElements.firstChild(element) : element;
+        // Check to see if the value passed is actually an object with explicit values
+        var isObjectWithExplicitValues = isPlainObject(value) && 
+                                         value['value'] === undefined &&
+                                         value['convert'] === undefined &&
+                                         value['field'] === undefined;
 
-        // Get the actual value from the element. If the binding handler does not
-        // have an explicit value, try to retrieve it from the value of inner text content
-        var fieldValue = (value !== undefined && value['value'] !== undefined) ? value['value'] : 
-                         (valueElement.innerText ||  
-                          valueElement.textContent ||
-                          valueElement.value);
-        
-        // If a convert function was passed, apply it to the field value.
-        // This can be used to convert the input string to the correct field value
-        if (value !== undefined && typeof value['convert'] === 'function') {
-            fieldValue = value['convert'](fieldValue);
-        }
+        if (isObjectWithExplicitValues) {
 
-        // Find the field accessor. If the init binding does not point to an observable
-        // or the field parameter doesn't, we try the text and value binding
-        var fieldAccessor = (ko.isObservable(value) ? value : undefined) || 
-                            (value ? value['field'] : undefined) ||                             
-                             allBindings.get('text') ||
-                             allBindings.get('textInput') ||
-                             allBindings.get('value');
+            // Loop through all the properties and set the observable values
+            for (var key in value) {
+              if (value.hasOwnProperty(key)) {
+                viewModel[key](value[key]);
+              }
+            }
+            
+        } else {
+            // Determine the element from which to retrieve the value
+            var valueElement = isVirtualNode(element) ? ko.virtualElements.firstChild(element) : element;
 
-        // Finally, update the observable with the value
-        fieldAccessor(fieldValue, unwrappedValue);
+            // Get the actual value from the element. If the binding handler does not
+            // have an explicit value, try to retrieve it from the value of inner text content
+            var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] : 
+                             (valueElement.innerText   ||  
+                              valueElement.textContent ||
+                              valueElement.value);
+            
+            // If a convert function was passed, apply it to the field value.
+            // This can be used to convert the input string to the correct field value
+            if (isPlainObject(value) && typeof value['convert'] === 'function') {
+                fieldValue = value['convert'](fieldValue);
+            }
+
+            // Find the field accessor. If the init binding does not point to an observable
+            // or the field parameter doesn't, we try the text and value binding
+            var fieldAccessor = (ko.isObservable(value) ? value : undefined) || 
+                                (isPlainObject(value) ? value['field'] : undefined) ||                             
+                                 allBindings.get('text')      ||
+                                 allBindings.get('textInput') ||
+                                 allBindings.get('value');
+
+            // Finally, update the observable with the value
+            fieldAccessor(fieldValue, unwrappedValue);
+        }        
     }
 };
 
