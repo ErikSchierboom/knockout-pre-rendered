@@ -120,7 +120,7 @@ describe("foreachInit binding", function () {
                       "<li data-bind='text: $data'></li>" +
                     "</ul>");
     var list = ['F1', 'F2'];
-    var $template = $("<template id='tID'><li data-bind='text: $data' data-template></li><!--/ko--></template>")
+    var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
     assert.equal(target.html(), '<li data-bind="text: $data">F1</li>' + 
@@ -134,7 +134,7 @@ describe("foreachInit binding", function () {
                       "<li data-bind='text: $data' data-init></li>" +
                     "</ul>");
     var list = ['G1', 'G2'];
-    var $template = $("<script type='text/ko-template' id='tID'><li data-bind='text: $data' data-template></script>")
+    var $template = $("<script type='text/ko-template' id='tID'><li data-bind='text: $data'></li></script>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
     assert.equal(target.html(), '<li data-bind="text: $data" data-init="">G1</li>' + 
@@ -144,15 +144,15 @@ describe("foreachInit binding", function () {
 
   it("uses the name/id of a <div>", function () {
     var target = $("<ul data-bind='foreachInit: { name: \"tID2\", data: $data }'>" +
-                      "<li data-bind='text: $data' data-init></li>" +
-                      "<li data-bind='text: $data' data-init></li>" +
+                      "<li data-bind='text: $data'></li>" +
+                      "<li data-bind='text: $data'></li>" +
                     "</ul>");
     var list = ['H1', 'H2'];
-    var $template = $("<div id='tID2'><li data-bind='text: $data' data-template><!--/ko--></div>")
+    var $template = $("<div id='tID2'><li data-bind='text: $data'><!--/ko--></div>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    assert.equal(target.html(), '<li data-bind="text: $data" data-init="">H1</li>' + 
-                                '<li data-bind="text: $data" data-init="">H2</li>');
+    assert.equal(target.html(), '<li data-bind="text: $data">H1</li>' + 
+                                '<li data-bind="text: $data">H2</li>');
     $template.remove();
   });
 

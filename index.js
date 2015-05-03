@@ -44,7 +44,7 @@ function findChildren(parentNode, attribute) {
 
 // Get a copy of the template node of the given element,
 // put them into a container, then remove the template node.
-function makeTemplateNode(sourceNode) {
+function makeTemplateNode(sourceNode, namedTemplate) {
   var container = document.createElement('div');
   var parentNode;
   var namedTemplate;
@@ -52,15 +52,12 @@ function makeTemplateNode(sourceNode) {
   if (sourceNode.content) {
     // For e.g. <template> tags
     parentNode = sourceNode.content;
-    namedTemplate = true;
   } else if (sourceNode.tagName === 'SCRIPT') {
     parentNode = document.createElement('div');
     parentNode.innerHTML = sourceNode.text;
-    namedTemplate = true;
   } else {
     // Anything else e.g. <div>
     parentNode = sourceNode;
-    namedTemplate = false;
   }
 
   // Find the template and add it to the container
@@ -70,10 +67,7 @@ function makeTemplateNode(sourceNode) {
   // Remove the template node
   ko.removeNode(template);
 
-  return { 
-    node: container,
-    namedTemplate: namedTemplate
-  };
+  return container;
 }
 
 // Add an existing element
@@ -94,8 +88,10 @@ function InitializedForeach(spec) {
   this.data = spec.data;
   this.as = spec.as;
   this.noContext = spec.noContext;
+  this.namedTemplate = spec.name !== undefined;
   this.templateNode = makeTemplateNode(
-    spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element
+    spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element,
+    this.namedTemplate
   );
   this.afterQueueFlush = spec.afterQueueFlush;
   this.beforeQueueFlush = spec.beforeQueueFlush;
@@ -105,7 +101,7 @@ function InitializedForeach(spec) {
   this.rendering_queued = false;
 
   // Find the existing elements that will be bound to the data array
-  this.existingElements = findChildren(this.container, this.templateNode.namedTemplate ? null : 'data-init');
+  this.existingElements = findChildren(this.container, this.namedTemplate ? null : 'data-init');
 
   // Check to see if we should manually create the array elements
   if (typeof spec.createElement === 'function') {
@@ -216,7 +212,7 @@ InitializedForeach.prototype.existing = function (index, value) {
 // Process a changeItem with {status: 'added', ...}
 InitializedForeach.prototype.added = function (index, value) {
   var referenceElement = this.lastNodesList[index - 1] || null;
-  var templateClone = this.templateNode.node.cloneNode(true);
+  var templateClone = this.templateNode.cloneNode(true);
   var childNodes = ko.virtualElements.childNodes(templateClone);
   var childContext;
  
