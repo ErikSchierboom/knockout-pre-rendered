@@ -244,4 +244,4 @@ There is a JSBin demo for each of the binding handlers:
 Many thanks go out to [Brian M Hunt](https://github.com/brianmhunt), which [`fastForEach` binding handler](https://github.com/brianmhunt/knockout-fast-foreach) formed the basis of the `foreachInit` binding handler.
 
 ## License
-[Apache License 2.0](LICENSE.md)
+[Apache License 2.0](LICENSE)
