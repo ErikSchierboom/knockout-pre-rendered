@@ -203,6 +203,8 @@ The best way to install this library is using [Bower](http://bower.io/):
 
     bower install knockout-pre-rendered
 
+The library is also available from a [CDN](https://cdnjs.com/libraries/knockout-pre-rendered).
+
 ## Demos
 There is a JSBin demo for each of the binding handlers:
 
