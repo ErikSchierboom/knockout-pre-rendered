@@ -1,9 +1,5 @@
 var gulp    = require('gulp'),
-    yaml    = require('js-yaml'),
-    fs      = require('fs'),
-    config  = yaml.safeLoad(fs.readFileSync('./config.yaml', 'utf8')),
     plugins = require('gulp-load-plugins')(),
-    replace = require('gulp-replace'),
     mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 function updateVersion(importance) {
@@ -18,7 +14,14 @@ gulp.task('release', function() { return updateVersion('major'); });
 
 gulp.task('webserver', function () {
   return gulp.src('.')
-    .pipe(plugins.webserver(config.webserver));
+    .pipe(plugins.webserver({
+      port: 4054,
+      open: 'spec/runner.html',
+      livereload: {
+        enable: true,
+        port: 4055
+      }
+    }));
 });
 
 gulp.task('test', function () {
@@ -31,9 +34,7 @@ gulp.task('js', function () {
   var pkg = require('./package.json');
 
   gulp.src("./index.js")
-    .pipe(plugins.header(config.header, { pkg: pkg, now: new Date() }))
-    .pipe(plugins.footer(config.footer))
-    .pipe(replace('{{ version }}', pkg.version))
+    .pipe(plugins.replace('{{ version }}', pkg.version))
     .pipe(plugins.rename('knockout-pre-rendered.js'))
     .pipe(gulp.dest('./dist'))
     .pipe(plugins.uglify())
@@ -42,7 +43,7 @@ gulp.task('js', function () {
 });
 
 gulp.task('watch', ['js'], function () {
-  gulp.watch(config.watch, ['js']);
+  gulp.watch(['index.js', 'spec/*'], ['js']);
 });
 
 gulp.task('live', ['watch', 'webserver']);

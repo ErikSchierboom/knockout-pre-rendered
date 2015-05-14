@@ -1,0 +1,31 @@
+body {
+  padding: 30px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#Ffixture, #Ofixture {
+  border: 1px solid green;
+  width: 40%;
+  float: left;
+  padding: 10px;
+  margin: 0;
+  margin-left: 18px;
+}
+
+#Ffixture ul, #Ofixture ul {
+  overflow-y: scroll;
+  max-height: 250px;
+  background-color: #CCC;
+}
+
+code {
+  font-weight: bold;
+  font-family: monospace;
+}
+
+#mocha-stats {
+  top: 150px;
+}

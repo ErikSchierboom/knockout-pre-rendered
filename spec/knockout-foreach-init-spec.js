@@ -3,13 +3,13 @@ assert = chai.assert;
 
 // Make the frame animation synchronous; simplifies testing.
 function setupSynchronousFrameAnimation () {
-  var originalAnimateFrame = InitializedForeach.animateFrame;
+  var originalAnimateFrame = ko.bindingHandlers.foreachInit.InitializedForeach.animateFrame;
   beforeEach(function () {
-    originalAnimateFrame = InitializedForeach.animateFrame;
-    InitializedForeach.animateFrame = function(frame) { frame() };
+    originalAnimateFrame = ko.bindingHandlers.foreachInit.InitializedForeach.animateFrame;
+    ko.bindingHandlers.foreachInit.InitializedForeach.animateFrame = function(frame) { frame() };
   })
   afterEach(function () {
-    InitializedForeach.animateFrame = originalAnimateFrame;
+    ko.bindingHandlers.foreachInit.InitializedForeach.animateFrame = originalAnimateFrame;
   })
 }
 
