@@ -2,7 +2,7 @@
   "name": "knockout-pre-rendered",
   "version": "0.4.1",
   "description": "Knockout pre-rendered",
-  "main": "index.js",
+  "main": "dist/knockout-pre-rendered.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -38,8 +38,9 @@
     "gulp-webserver": "^0.9.0",
     "jquery": "^2.1.3",
     "js-yaml": "^3.2.2",
-    "knockout": "^3.2.0",
     "mocha": "^2.2.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "knockout": "^3.2.0"
+  }
 }

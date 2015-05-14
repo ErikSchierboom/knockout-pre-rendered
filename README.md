@@ -1,6 +1,7 @@
 # Knockout pre-rendered binding handlers
 
 [![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered) 
+[![npm version](https://badge.fury.io/js/knockout-pre-rendered.svg)](http://badge.fury.io/js/knockout-pre-rendered)
 [![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
 
 This library adds two new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
@@ -202,6 +203,10 @@ What happens is that for each element with the `data-init` attribute, the functi
 The best way to install this library is using [Bower](http://bower.io/):
 
     bower install knockout-pre-rendered
+
+You can also install the library using NPM:
+
+    npm install knockout-pre-rendered --save-dev
 
 The library is also available from a [CDN](https://cdnjs.com/libraries/knockout-pre-rendered).
 
