@@ -87,7 +87,7 @@ Converting works the same as before:
 <!-- ko init: { field: height, convert: parseInt } -->198<!-- /ko -->
 ```
 
-Note that we now need to explicitly specify the `field` parameter, which points to the observable to initialize. In our previous examples, the `init` binding was able to infer this due to it being combined with the `text`, `textInput` or `value` binding and using the observable they were pointing to. As a consequence, the following bindings are equivalent:
+Note that we now need to explicitly specify the `field` parameter, which points to the observable to initialize. In our previous examples, the `init` binding was able to infer this due to it being combined with the `text`, `textInput`, `value` or `checked` binding and using the observable they were pointing to. As a consequence, the following bindings are equivalent:
 
 ```html
 <span data-bind="init, text: name">Michael Jordan</span>
@@ -224,6 +224,21 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2014-05-27</td>
+     <td>0.5.0</td>
+     <td>Added support for `checked` binding handler.</td>
+  </tr>
+  <tr>
+     <td>2014-05-03</td>
+     <td>0.4.1</td>
+     <td>Fixed named template bug.</td>
+  </tr>
+  <tr>
+     <td>2014-05-02</td>
+     <td>0.4.0</td>
+     <td>Added support for initialization through key/value pairs.</td>
   </tr>
   <tr>
      <td>2014-04-22</td>

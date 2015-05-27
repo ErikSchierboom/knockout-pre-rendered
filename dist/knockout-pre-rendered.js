@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.4.1
+  Knockout pre-rendered binding handlers v0.5.0
   By: Erik Schierboom (C) 2015
   License: Apache 2
 
@@ -363,9 +363,10 @@
               // Get the actual value from the element. If the binding handler does not
               // have an explicit value, try to retrieve it from the value of inner text content
               var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] : 
-                               (valueElement.innerText   ||  
-                                valueElement.textContent ||
-                                valueElement.value);
+                               (allBindings.get('checked') ? valueElement.checked : 
+                                (valueElement.innerText   ||  
+                                 valueElement.textContent ||
+                                 valueElement.value));
               
               // If a convert function was passed, apply it to the field value.
               // This can be used to convert the input string to the correct field value
@@ -379,7 +380,8 @@
                                   (isPlainObject(value) ? value['field'] : undefined) ||                             
                                    allBindings.get('text')      ||
                                    allBindings.get('textInput') ||
-                                   allBindings.get('value');
+                                   allBindings.get('value')     ||
+                                   allBindings.get('checked');
 
               // Finally, update the observable with the value
               fieldAccessor(fieldValue, unwrappedValue);

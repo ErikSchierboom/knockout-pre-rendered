@@ -271,4 +271,62 @@ describe("init binding", function () {
       assert.strictEqual(model.year(), 230);
     });
   });
+
+  describe("combined with checked binding", function () {
+    it("works with an observable", function () {
+      var target = $("<input data-bind='init, checked: visited' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isTrue(model.visited());
+    });
+
+    it("works with a computed", function () {
+      var target = $("<input data-bind='init, checked: visitedComputed' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isTrue(model.visitedComputed());
+    });
+
+    it("works with field attribute", function () {
+      var target = $("<input data-bind='init: { field: visited }, checked: visited' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isTrue(model.visited());
+    });
+
+    it("works with convert attribute", function () {
+      var target = $("<input data-bind='init: { field: visited, convert: function(x) { return !x; } }, checked: visited' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isFalse(model.visited());
+    });
+
+    it("works with convert attribute without field", function () {
+      var target = $("<input data-bind='init: { convert: function(x) { return !x; } }, checked: visited' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isFalse(model.visited());
+    });
+
+    it("works with checkbox is checked", function () {
+      var target = $("<input data-bind='init, checked: visited' type='checkbox' checked='checked' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), 'checked');
+      assert.isTrue(model.visited());
+    });
+
+    it("works with checkbox is not checked", function () {
+      var target = $("<input data-bind='init, checked: visited' type='checkbox' />");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      assert.equal($(target).attr('checked'), undefined);
+      assert.isFalse(model.visited());
+    });
+  });
 });

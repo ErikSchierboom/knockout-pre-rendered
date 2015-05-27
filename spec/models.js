@@ -19,7 +19,15 @@ function ViewModel() {
   });
   self.year = ko.observable(0);
   self.visited = ko.observable(false);
-
+  self.visitedComputed = ko.computed({
+    read: function () { 
+        return self.visited();
+    }, 
+    write: function (value) { 
+        self.visited(value);
+    }
+  });
+  
   self.createCity = function() {
     return new CityViewModel();
   };
