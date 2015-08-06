@@ -188,7 +188,7 @@ Note that the `persons` observable array does not contain any elements, but that
 We can use the `foreachInit` binding handler as follows:
 
 ```html
-<ul data-bind="foreachInit: { data: persons, createElement: addPerson }">  
+<ul data-bind="foreachInit: { data: persons, createElement: createPerson }">  
   <li data-template data-bind="text: name"></li>
   <li data-init data-bind="init, text: name">Michael Jordan</li>
   <li data-init data-bind="init, text: name">Larry Bird</li>
@@ -196,8 +196,17 @@ We can use the `foreachInit` binding handler as follows:
 </ul>
 ```
 
-What happens is that for each element with the `data-init` attribute, the function specified in the `createElement` parameter is called.
+What happens is that for each element with the `data-init` attribute, the function specified in the `createElement` parameter is called. Our modified code now looks as follows:
 
+```javascript
+function ForeachDynamicViewModel() {
+  this.persons = ko.observableArray();
+
+  this.createPerson = function() {
+    return new PersonViewModel();
+  }
+}
+```
 
 ## Installation
 The best way to install this library is using [Bower](http://bower.io/):
@@ -214,8 +223,10 @@ The library is also available from a [CDN](https://cdnjs.com/libraries/knockout-
 There is a JSBin demo for each of the binding handlers:
 
 - [`foreachInit` binding](http://jsbin.com/nocaro)
-- [`init with text` binding](http://jsbin.com/jazeke)
-- [`init with value` binding](http://jsbin.com/xuluye/)
+- [`foreachInit` binding using createElement](http://jsbin.com/mapefa)
+- [`foreachInit` binding using template](http://jsbin.com/seloqo)
+- [`init` with text binding](http://jsbin.com/jazeke)
+- [`init` with value binding](http://jsbin.com/xuluye/)
 - [`init` binding](http://jsbin.com/wikaji/)
 
 ## History
@@ -224,6 +235,14 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2014-08-06</td>
+     <td>0.5.1</td>
+     <td>
+        Fixed bug where foreachInit did not correctly read template.<br/>
+        Added links to two more foreachInit demo's.
+      </td>
   </tr>
   <tr>
      <td>2014-05-27</td>

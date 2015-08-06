@@ -180,8 +180,8 @@ describe("foreachInit binding", function () {
   });
 
   it("can create array elements using callback", function () {
-    var target = $("<ul data-bind='foreachInit: { data: $data.cities, createElement: createCity }'>" +
-                        "<li data-bind='init: name, text: name' data-template></li>" +
+    var target = $("<ul data-bind='foreachInit: { data: cities, createElement: createCity }'>" +
+                        "<li data-bind='text: name' data-template></li>" +
                         "<li data-bind='init: name, text: name' data-init>London</li>" +
                         "<li data-bind='init: name, text: name' data-init>Paris</li>" +
                         "<li data-bind='init: name, text: name' data-init>Amsterdam</li>" +
