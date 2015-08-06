@@ -125,7 +125,6 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
-    $template.remove();
   });
 
   it("uses the name/id of a <script>", function () {
@@ -139,7 +138,6 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">G1</li>' + 
                                    '<li data-bind="text: $data" data-init="">G2</li>');
-    $template.remove();
   });
 
   it("uses the name/id of a <div>", function () {
@@ -153,7 +151,6 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">H1</li>' + 
                                    '<li data-bind="text: $data">H2</li>');
-    $template.remove();
   });
 
   it("does not require data-template attribute if named template is used", function () {
@@ -167,7 +164,6 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
-    $template.remove();
   });
 
   it("does not require data-init attribute if named template is used", function () {
@@ -181,7 +177,6 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
-    $template.remove();
   });
 
   it("can create array elements using callback", function () {
@@ -414,7 +409,7 @@ describe("foreachInit binding", function () {
 
     it("works with init and value", function () {
       var target = $("<div data-bind='foreachInit: $data'>" +
-                        "<input data-bind='value: name' data-template>" +
+                        "<input data-bind='value: name' data-template />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='London' />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='Paris' />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='Amsterdam' />" +
@@ -443,5 +438,22 @@ describe("foreachInit binding", function () {
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
     }); 
+
+    it("works with init and template", function () {
+      var target = $("<div data-bind='foreachInit: { name: \"tID2\", data: $data }'>" +
+                        "<input data-bind='init: name, value: name' data-init type='text' value='London' />" +
+                        "<input data-bind='init: name, value: name' data-init type='text' value='Paris' />" +
+                        "<input data-bind='init: name, value: name' data-init type='text' value='Amsterdam' />" +
+                      "</div>");
+      var $template = $("<input data-bind='value: name' data-template />")
+        .appendTo(document.body)
+      ko.applyBindings(model, target[0]);
+      expect(target.html()).to.equal('<input data-bind="init: name, value: name" data-init="" type="text" value="London">' +
+                                     '<input data-bind="init: name, value: name" data-init="" type="text" value="Paris">' +
+                                     '<input data-bind="init: name, value: name" data-init="" type="text" value="Amsterdam">');
+      expect(model()[0].name()).to.equal('London');
+      expect(model()[1].name()).to.equal('Paris');
+      expect(model()[2].name()).to.equal('Amsterdam');
+    });
   });
 });

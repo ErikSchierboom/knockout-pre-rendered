@@ -41,28 +41,30 @@
     return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
   }
 
-  // Find the first children of the specified parent node. If the attribute is defined, the child
-  // also need to have that attribute
-  function findFirstChild(parentNode, attribute) {
-    return ko.utils.arrayFirst(ko.virtualElements.childNodes(parentNode), function (child) {
-      if (typeof (attribute) === 'string') {
-        return child && child.attributes && child.attributes[attribute];  
-      }
-
-      return child;    
-    });
+  // Check if a node is an element node
+  function isElementNode(node) {
+    return node && node.nodeType && node.nodeType === 1;
   }
 
-  // Find children of the specified parent node. If the attribute is defined, the children
-  // also need to have that attribute
-  function findChildren(parentNode, attribute) {
-    return ko.utils.arrayFilter(ko.virtualElements.childNodes(parentNode), function (child) {
+  // Check if a node is a valid child node
+  function isValidChildNode(attribute, childNode) {
       if (typeof (attribute) === 'string') {
-        return child && child.attributes && child.attributes[attribute];  
+        return isElementNode(childNode) && childNode.attributes && childNode.attributes[attribute];  
       }
 
-      return child;    
-    });
+      return isElementNode(childNode);    
+  }
+
+  // Find the first children of the specified parent node. If the attribute is defined, the child node
+  // also need to have that attribute
+  function findFirstChild(parentNode, attribute) {
+    return ko.utils.arrayFirst(ko.virtualElements.childNodes(parentNode), isValidChildNode.bind(this, attribute));
+  }
+
+  // Find children of the specified parent node. If the attribute is defined, the child nodes
+  // also need to have that attribute
+  function findChildren(parentNode, attribute) {
+    return ko.utils.arrayFilter(ko.virtualElements.childNodes(parentNode), isValidChildNode.bind(this, attribute));
   }
 
   // Get a copy of the template node of the given element,
@@ -77,7 +79,7 @@
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
       parentNode = document.createElement('div');
-      parentNode.innerHTML = sourceNode.text;
+      parentNode.innerHTML = sourceNode.innerHTML;
     } else {
       // Anything else e.g. <div>
       parentNode = sourceNode;
