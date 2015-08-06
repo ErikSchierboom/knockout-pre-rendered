@@ -16,11 +16,7 @@ gulp.task('webserver', function () {
   return gulp.src('.')
     .pipe(plugins.webserver({
       port: 4054,
-      open: 'spec/runner.html',
-      livereload: {
-        enable: true,
-        port: 4055
-      }
+      open: 'spec/runner.html'
     }));
 });
 
