@@ -3,6 +3,7 @@
 [![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered) 
 [![npm version](https://badge.fury.io/js/knockout-pre-rendered.svg)](http://badge.fury.io/js/knockout-pre-rendered)
 [![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
+[![Build status](https://ci.appveyor.com/api/projects/status/b3mfjd4ofs9dsv1w?svg=true)](https://ci.appveyor.com/project/ErikSchierboom/knockout-pre-rendered)
 
 This library adds two new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
 
