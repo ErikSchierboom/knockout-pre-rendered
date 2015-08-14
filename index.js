@@ -214,23 +214,23 @@
     this.changeQueue = [];
   };
 
+  InitializedForeach.prototype.createChildContext = function (index, value) {
+    if(this.noContext) {
+      return this.$context.extend({
+        '$item' : value
+      });
+    }
+
+    return this.$context.createChildContext(value, this.as || null, function(context) {
+      context['$index'] = index;
+    });
+  }
 
   // Process a changeItem with {status: 'existing', ...}
   InitializedForeach.prototype.existing = function (index, value) {
-    var childContext;
-    
-    if(this.noContext) {
-      childContext = this.$context.extend({
-        '$item' : value
-      });
-    } else {
-      childContext = this.$context.createChildContext(value, this.as || null);
-    }
-
     var existingElement = this.existingElements[index];
-
     this.lastNodesList.splice(index, 0, existingElement);
-    ko.applyBindings(childContext, existingElement);
+    ko.applyBindings(this.createChildContext(index, value), existingElement);
   };
 
 
@@ -239,18 +239,9 @@
     var referenceElement = this.lastNodesList[index - 1] || null;
     var templateClone = this.templateNode.cloneNode(true);
     var childNodes = ko.virtualElements.childNodes(templateClone);
-    var childContext;
-   
-    if(this.noContext) {
-      childContext = this.$context.extend({
-        '$item' : value
-      });
-    } else {
-      childContext = this.$context.createChildContext(value, this.as || null);
-    }
 
     this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
-    ko.applyBindingsToDescendants(childContext, templateClone);
+    ko.applyBindingsToDescendants(this.createChildContext(index, value), templateClone);
 
     // Nodes are inserted in reverse order - pushed down immediately after
     // the last node for the previous item or as the first node of element.

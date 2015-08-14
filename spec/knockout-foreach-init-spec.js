@@ -125,6 +125,7 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
+    $template.remove();
   });
 
   it("uses the name/id of a <script>", function () {
@@ -138,6 +139,7 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">G1</li>' + 
                                    '<li data-bind="text: $data" data-init="">G2</li>');
+    $template.remove();
   });
 
   it("uses the name/id of a <div>", function () {
@@ -151,6 +153,7 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">H1</li>' + 
                                    '<li data-bind="text: $data">H2</li>');
+    $template.remove();
   });
 
   it("does not require data-template attribute if named template is used", function () {
@@ -164,6 +167,7 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
+    $template.remove();
   });
 
   it("does not require data-init attribute if named template is used", function () {
@@ -177,6 +181,7 @@ describe("foreachInit binding", function () {
     ko.applyBindings(list, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
                                    '<li data-bind="text: $data">F2</li>');
+    $template.remove();
   });
 
   it("can create array elements using callback", function () {
@@ -197,7 +202,6 @@ describe("foreachInit binding", function () {
   });
 
   describe("observable array changes", function () {
-    setupSynchronousFrameAnimation();
     var div, obs, view;
 
     beforeEach(function () {
@@ -349,7 +353,6 @@ describe("foreachInit binding", function () {
   });
 
   describe("combined with nested initializers", function () {
-    setupSynchronousFrameAnimation();
     var model;
 
     beforeEach(function () {
@@ -445,7 +448,7 @@ describe("foreachInit binding", function () {
                         "<input data-bind='init: name, value: name' data-init type='text' value='Paris' />" +
                         "<input data-bind='init: name, value: name' data-init type='text' value='Amsterdam' />" +
                       "</div>");
-      var $template = $("<input data-bind='value: name' data-template />")
+      var $template = $("<script type='text/ko-template' id='tID2'><input data-bind='value: name' data-template /></script>")
         .appendTo(document.body)
       ko.applyBindings(model, target[0]);
       expect(target.html()).to.equal('<input data-bind="init: name, value: name" data-init="" type="text" value="London">' +
@@ -454,6 +457,57 @@ describe("foreachInit binding", function () {
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
+      $template.remove();
     });
+  });
+
+  describe("creates child context", function () {
+
+    it("with $data property", function () {
+      var target = $("<ul data-bind='foreachInit: $data'>" +
+                      "<li data-bind='text: $data' data-template></li>" +
+                      "<li data-init><span data-bind='text: $data' /></li>" +
+                      "<li data-init><span data-bind='text: $data' /></li>" +
+                      "<li data-init><span data-bind='text: $data' /></li>" +
+                    "</ul>");
+      var list = ['A', 'B', 'C'];
+      ko.applyBindings(list, target[0]);
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span></li>' + 
+                                     '<li data-init=""><span data-bind="text: $data">B</span></li>' +
+                                     '<li data-init=""><span data-bind="text: $data">C</span></li>');
+    }); 
+
+    it("with $index property", function () {
+      var target = $("<ul data-bind='foreachInit: $data'>" +
+                      "<li data-bind='text: $data' data-template></li>" +
+                      "<li data-init><span data-bind='text: $data' /><span data-bind='text: $index' /></li>" +
+                      "<li data-init><span data-bind='text: $data' /><span data-bind='text: $index' /></li>" +
+                      "<li data-init><span data-bind='text: $data' /><span data-bind='text: $index' /></li>" +
+                    "</ul>");
+      var list = ['A', 'B', 'C'];
+      ko.applyBindings(list, target[0]);
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span><span data-bind="text: $index">0</span></li>' + 
+                                     '<li data-init=""><span data-bind="text: $data">B</span><span data-bind="text: $index">1</span></li>' +
+                                     '<li data-init=""><span data-bind="text: $data">C</span><span data-bind="text: $index">2</span></li>');
+    }); 
+
+    it("with $parent property", function () {
+      var target = $("<ul data-bind='foreachInit: cities'>" +
+                      "<li data-bind='text: $data' data-template></li>" +
+                      "<li data-init><span data-bind='text: $parent.city' /></li>" +
+                      "<li data-init><span data-bind='text: $parent.city' /></li>" +
+                      "<li data-init><span data-bind='text: $parent.city' /></li>" +
+                    "</ul>");
+      var model = new ViewModel();
+      model.city('New York')
+      model.cities.push(new CityViewModel());
+      model.cities.push(new CityViewModel());
+      model.cities.push(new CityViewModel());
+
+      ko.applyBindings(model, target[0]);
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' + 
+                                     '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' + 
+                                     '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>');
+    }); 
   });
 });
