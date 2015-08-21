@@ -238,6 +238,11 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2015-08-24</td>
+     <td>0.5.3</td>
+     <td>Fixed $index not updating when deleting items.</td>
+  </tr>
+  <tr>
      <td>2014-08-14</td>
      <td>0.5.2</td>
      <td>Fixed missing $index property in foreachInit binding.</td>

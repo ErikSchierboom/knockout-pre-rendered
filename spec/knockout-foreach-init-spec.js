@@ -489,7 +489,7 @@ describe("foreachInit binding", function () {
       expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span><span data-bind="text: $index">0</span></li>' + 
                                      '<li data-init=""><span data-bind="text: $data">B</span><span data-bind="text: $index">1</span></li>' +
                                      '<li data-init=""><span data-bind="text: $data">C</span><span data-bind="text: $index">2</span></li>');
-    }); 
+    });
 
     it("with $parent property", function () {
       var target = $("<ul data-bind='foreachInit: cities'>" +

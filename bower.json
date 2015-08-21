@@ -1,7 +1,7 @@
 {
   "name": "knockout-pre-rendered",
   "main": "dist",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "homepage": "https://github.com/ErikSchierboom/knockout-pre-rendered",
   "authors": [
     "Erik Schierboom <erik_schierboom@hotmail.com>"

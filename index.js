@@ -122,6 +122,7 @@
     this.beforeQueueFlush = spec.beforeQueueFlush;
     this.changeQueue = [];
     this.lastNodesList = [];
+    this.childContexts = [];
     this.indexesToDelete = [];
     this.rendering_queued = false;
 
@@ -151,18 +152,15 @@
     }
   }
 
-
   InitializedForeach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
     window.mozRequestAnimationFrame || window.msRequestAnimationFrame ||
     function(cb) { return window.setTimeout(cb, 1000 / 60); };
-
 
   InitializedForeach.prototype.dispose = function () {
     if (this.changeSubs) {
       this.changeSubs.dispose();
     }
   };
-
 
   // If the array changes we register the change.
   InitializedForeach.prototype.onArrayChange = function (changeSet) {
@@ -191,7 +189,6 @@
       InitializedForeach.animateFrame.call(window, function () { self.processQueue(); });
     }
   };
-
 
   // Reflect all the changes in the queue in the DOM, then wipe the queue.
   InitializedForeach.prototype.processQueue = function () {
@@ -222,7 +219,7 @@
     }
 
     return this.$context.createChildContext(value, this.as || null, function(context) {
-      context['$index'] = index;
+      context['$index'] = ko.observable(index);
     });
   }
 
@@ -230,9 +227,9 @@
   InitializedForeach.prototype.existing = function (index, value) {
     var existingElement = this.existingElements[index];
     this.lastNodesList.splice(index, 0, existingElement);
-    ko.applyBindings(this.createChildContext(index, value), existingElement);
+    this.childContexts[index] = this.createChildContext(index, value);
+    ko.applyBindings(this.childContexts[index], existingElement);
   };
-
 
   // Process a changeItem with {status: 'added', ...}
   InitializedForeach.prototype.added = function (index, value) {
@@ -241,7 +238,8 @@
     var childNodes = ko.virtualElements.childNodes(templateClone);
 
     this.lastNodesList.splice(index, 0, childNodes[childNodes.length - 1]);
-    ko.applyBindingsToDescendants(this.createChildContext(index, value), templateClone);
+    this.childContexts[index] = this.createChildContext(index, value);
+    ko.applyBindingsToDescendants(this.childContexts[index], templateClone);
 
     // Nodes are inserted in reverse order - pushed down immediately after
     // the last node for the previous item or as the first node of element.
@@ -251,7 +249,6 @@
       ko.virtualElements.insertAfter(this.element, child, referenceElement);
     }
   };
-
 
   // Process a changeItem with {status: 'deleted', ...}
   InitializedForeach.prototype.deleted = function (index, value) {
@@ -265,21 +262,29 @@
       ko.removeNode((ptr && ptr.nextSibling) || ko.virtualElements.firstChild(this.element));
     } while (ptr && ptr !== lastNode);
 
-    // The "last node" in the DOM from which we begin our delets of the next adjacent node is
+    // The "last node" in the DOM from which we begin our deletes of the next adjacent node is
     // now the sibling that preceded the first node of this item. 
     this.lastNodesList[index] = this.lastNodesList[index - 1];
     this.indexesToDelete.push(index);
   };
 
-
   // We batch our deletion of item indexes in our parallel array.
   // See brianmhunt/knockout-fast-foreach#6/#8
   InitializedForeach.prototype.clearDeletedIndexes = function () {
+
     // We iterate in reverse on the presumption (following the unit tests) that KO's diff engine
     // processes diffs (esp. deletes) monotonically ascending i.e. from index 0 -> N.
     for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
       this.lastNodesList.splice(this.indexesToDelete[i], 1);
-    }
+      this.childContexts.splice(this.indexesToDelete[i], 1);
+    }  
+
+    // Having deleted items means we need to update the index observables
+    for (var j = this.childContexts.length - 1; j >= 0; --j) {      
+      if (this.childContexts[j] && this.childContexts[j]['$index']) {
+        this.childContexts[j]['$index'](j);
+      }
+    }  
 
     this.indexesToDelete = [];
   };
