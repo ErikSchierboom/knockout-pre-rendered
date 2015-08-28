@@ -333,6 +333,11 @@
 
   ko.virtualElements.allowedBindings.foreachInit = true;
 
+  function elementIsHidden(element) {
+    return (element.offsetWidth <= 0 && element.offsetHeight <= 0) || 
+           (element.style && element.style.display && element.style.display == 'none');
+  }
+
   // This binding handler initializes an observable to a value from the HTML element
   ko.bindingHandlers.init = {
       init: function (element, valueAccessor, allBindings, viewModel) {
@@ -362,6 +367,7 @@
               // have an explicit value, try to retrieve it from the value of inner text content
               var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] : 
                                (allBindings.get('checked') ? valueElement.checked : 
+                                allBindings.get('visible') ? !elementIsHidden(valueElement) :
                                 (valueElement.innerText   ||  
                                  valueElement.textContent ||
                                  valueElement.value));
@@ -379,7 +385,8 @@
                                    allBindings.get('text')      ||
                                    allBindings.get('textInput') ||
                                    allBindings.get('value')     ||
-                                   allBindings.get('checked');
+                                   allBindings.get('checked')   ||
+                                   allBindings.get('visible');
 
               // Finally, update the observable with the value
               fieldAccessor(fieldValue, unwrappedValue);

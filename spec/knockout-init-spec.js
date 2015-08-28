@@ -329,4 +329,113 @@ describe("init binding", function () {
       expect(model.visited()).to.be.false;
     });
   });
+
+  describe("combined with visible binding", function () {
+
+    describe("on visible element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<span data-bind='init, visible: visited'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visited()).to.be.true;
+        $template.remove();
+      });
+
+      it("works with a computed", function () {
+        var target = $("<span data-bind='init, visible: visitedComputed'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visitedComputed()).to.be.true;
+        $template.remove();
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<span data-bind='init: { field: visited }, visible: visited'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visited()).to.be.true;
+        $template.remove();
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<span data-bind='init: { field: visited, convert: function(x) { return !x; } }, visible: visited'>230</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('230');
+        expect(model.visited()).to.be.false;
+        $template.remove();
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<span data-bind='init: { convert: function(x) { return !x; } }, visible: visited'>230</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('230');
+        expect(model.visited()).to.be.false;
+        $template.remove();
+      });
+    });
+
+    describe("on hidden element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<span data-bind='init, visible: visited' style='display: none'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visited()).to.be.false;
+        $template.remove();
+      });
+
+      it("works with a computed", function () {
+        var target = $("<span data-bind='init, visible: visitedComputed' style='display: none'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visitedComputed()).to.be.false;
+        $template.remove();
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<span data-bind='init: { field: visited }, visible: visited' style='display: none'>London</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('London');
+        expect(model.visited()).to.be.false;
+        $template.remove();
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<span data-bind='init: { field: visited, convert: function(x) { return !x; } }, visible: visited' style='display: none'>230</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('230');
+        expect(model.visited()).to.be.true;
+        $template.remove();
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<span data-bind='init: { convert: function(x) { return !x; } }, visible: visited' style='display: none'>230</span>");
+        var $template = target.appendTo(document.body);
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('230');
+        expect(model.visited()).to.be.true;
+        $template.remove();
+      });
+    });
+  });
 });
