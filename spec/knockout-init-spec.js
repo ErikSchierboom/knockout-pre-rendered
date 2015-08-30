@@ -438,4 +438,46 @@ describe("init binding", function () {
       });
     });
   });
+
+  describe("combined with html binding", function () {
+    it("works with an observable", function () {
+        var target = $("<span data-bind='init, html: city'><i>London</i></span>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('<i>London</i>');
+        expect(model.city()).to.equal('<i>London</i>');
+      });
+
+      it("works with a computed", function () {
+        var target = $("<span data-bind='init, html: cityComputed'><i>London</i></span>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('<i>London</i>');
+        expect(model.cityComputed()).to.equal('<i>London</i>');
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<span data-bind='init: { field: city }, html: city'><i>London</i></span>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('<i>London</i>');
+        expect(model.city()).to.equal('<i>London</i>');
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<span data-bind='init: { field: city, convert: function(x) { return x.toUpperCase(); } }, html: city'><i>London</i></span>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('<i>LONDON</i>');
+        expect(model.city()).to.equal('<I>LONDON</I>');
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<span data-bind='init: { convert: function(x) { return x.toUpperCase(); } }, html: city'><i>London</i></span>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).html()).to.equal('<i>LONDON</i>');
+        expect(model.city()).to.equal('<I>LONDON</I>');
+      });
+    });
 });

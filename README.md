@@ -117,6 +117,16 @@ This would set the `city` observable to `"London"` and the `year` observable to 
 
 Note: the keys cannot be equal to the `"value"`, `"convert"` or `"field"` strings.
 
+### Supported bindings
+
+The `init` binding can be used with the following bindings:
+
+- `text`: the value is set to the bound element's text contents.
+- `textInput`: the value is set to the bound element's text contents.
+- `value`: the value is set to the bound element's value.
+- `checked`: the value is set to the bound element's checked value.
+- `visible`: the value is set to the bound element's visibility (`true` or `false`).
+
 ## Foreach init binding
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:
 
@@ -228,6 +238,8 @@ There is a JSBin demo for each of the binding handlers:
 - [`foreachInit` binding using template](http://jsbin.com/seloqo)
 - [`init` with text binding](http://jsbin.com/jazeke)
 - [`init` with value binding](http://jsbin.com/xuluye/)
+- [`init` with checked binding](http://jsbin.com/zemode/)
+- [`init` with visible binding](http://jsbin.com/vufufa/)
 - [`init` binding](http://jsbin.com/wikaji/)
 
 ## History

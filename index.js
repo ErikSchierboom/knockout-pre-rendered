@@ -368,9 +368,8 @@
               var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] : 
                                (allBindings.get('checked') ? valueElement.checked : 
                                 allBindings.get('visible') ? !elementIsHidden(valueElement) :
-                                (valueElement.innerText   ||  
-                                 valueElement.textContent ||
-                                 valueElement.value));
+                                allBindings.get('html') ? valueElement.innerHTML :
+                                (valueElement.innerText || valueElement.textContent || valueElement.value));
               
               // If a convert function was passed, apply it to the field value.
               // This can be used to convert the input string to the correct field value
@@ -386,6 +385,7 @@
                                    allBindings.get('textInput') ||
                                    allBindings.get('value')     ||
                                    allBindings.get('checked')   ||
+                                   allBindings.get('html')      ||
                                    allBindings.get('visible');
 
               // Finally, update the observable with the value
