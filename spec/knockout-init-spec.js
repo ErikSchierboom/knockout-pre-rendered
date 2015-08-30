@@ -752,4 +752,47 @@ describe("init binding", function () {
       });
     });
   });
+
+  describe("combined with attr binding", function () {
+    it("works with an observable", function () {
+      var target = $("<a data-bind='init, attr: { href: link }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link()).to.equal('http://www.google.com');
+    });
+
+    it("works with a computed", function () {
+      var target = $("<a data-bind='init, attr: { href: linkComputed }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.linkComputed()).to.equal('http://www.google.com');
+    });
+
+    it("ignores field attribute", function () {
+      var target = $("<a data-bind='init: { field: city }, attr: { href: link }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link()).to.equal('http://www.google.com');
+    });
+
+    it("works with convert attribute", function () {
+      var target = $("<a data-bind='init: { convert: toUpperCase }, attr: { href: link }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link()).to.equal('HTTP://WWW.GOOGLE.COM');
+    });
+
+    it("works with multiple attributes", function () {
+      var target = $("<a data-bind='init, attr: { href: link, title: linkTitle }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link()).to.equal('http://www.google.com');
+      expect(model.linkTitle()).to.equal('Visit Google.com');
+    });
+  });
 });

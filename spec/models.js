@@ -17,6 +17,10 @@ function ViewModel() {
         self.city(value);
     }
   });
+
+  self.link = ko.observable();
+  self.linkComputed = ko.observable();
+  self.linkTitle = ko.observable();
   self.year = ko.observable(0);
   self.visited = ko.observable(false);
   self.visitedComputed = ko.computed({
