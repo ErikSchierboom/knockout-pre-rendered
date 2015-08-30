@@ -124,8 +124,12 @@ The `init` binding can be used with the following bindings:
 - `text`: the value is set to the bound element's text contents.
 - `textInput`: the value is set to the bound element's text contents.
 - `value`: the value is set to the bound element's value.
+- `html`: the value is set to the bound element's inner HTML value.
+- `attr`: the bound attribute properties are set to their respective attribute values.
 - `checked`: the value is set to the bound element's checked value.
-- `visible`: the value is set to the bound element's visibility (`true` or `false`).
+- `visible`: the value is set to `true` or `false` depending on the bound element's visibility.
+- `enable`: the value is set to `true` if the bound element does not have a `disabled` attribute; otherwise, it is set to `false`.
+- `disable`: the value is set to `true` if the bound element has a `disabled` attribute; otherwise, it is set to `true`.
 
 ## Foreach init binding
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:
@@ -238,8 +242,12 @@ There is a JSBin demo for each of the binding handlers:
 - [`foreachInit` binding using template](http://jsbin.com/seloqo)
 - [`init` with text binding](http://jsbin.com/jazeke)
 - [`init` with value binding](http://jsbin.com/xuluye/)
+- [`init` with html binding](http://jsbin.com/wilahi/)
+- [`init` with attr binding](http://jsbin.com/zehivi/)
 - [`init` with checked binding](http://jsbin.com/zemode/)
 - [`init` with visible binding](http://jsbin.com/vufufa/)
+- [`init` with enable binding](http://jsbin.com/moxoji/)
+- [`init` with disable binding](http://jsbin.com/bonapi/)
 - [`init` binding](http://jsbin.com/wikaji/)
 
 ## History
@@ -248,6 +256,11 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2015-08-30</td>
+     <td>0.6.0</td>
+     <td>Added support for `attr`, `html`, `visible`, `enable` and `disable` bindings.</td>
   </tr>
   <tr>
      <td>2015-08-24</td>
