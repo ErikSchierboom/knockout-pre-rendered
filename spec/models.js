@@ -31,4 +31,12 @@ function ViewModel() {
   self.createCity = function() {
     return new CityViewModel();
   };
+
+  self.toUpperCase = function(str) {
+      return str.toUpperCase();
+  };
+
+  self.negate = function(bool) {
+    return !bool;
+  };
 }

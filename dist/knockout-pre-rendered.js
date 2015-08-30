@@ -369,6 +369,7 @@
                                (allBindings.get('checked') ? valueElement.checked : 
                                 allBindings.get('visible') ? !elementIsHidden(valueElement) :
                                 allBindings.get('html') ? valueElement.innerHTML :
+                                allBindings.get('enable') ? !valueElement.disabled :
                                 (valueElement.innerText || valueElement.textContent || valueElement.value));
               
               // If a convert function was passed, apply it to the field value.
@@ -386,6 +387,7 @@
                                    allBindings.get('value')     ||
                                    allBindings.get('checked')   ||
                                    allBindings.get('html')      ||
+                                   allBindings.get('enable')    ||
                                    allBindings.get('visible');
 
               // Finally, update the observable with the value

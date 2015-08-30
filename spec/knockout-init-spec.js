@@ -298,7 +298,7 @@ describe("init binding", function () {
     });
 
     it("works with convert attribute", function () {
-      var target = $("<input data-bind='init: { field: visited, convert: function(x) { return !x; } }, checked: visited' type='checkbox' checked='checked' />");
+      var target = $("<input data-bind='init: { field: visited, convert: negate }, checked: visited' type='checkbox' checked='checked' />");
       var model = new ViewModel();
       ko.applyBindings(model, target[0]);
       expect($(target).attr('checked')).to.equal('checked');
@@ -306,7 +306,7 @@ describe("init binding", function () {
     });
 
     it("works with convert attribute without field", function () {
-      var target = $("<input data-bind='init: { convert: function(x) { return !x; } }, checked: visited' type='checkbox' checked='checked' />");
+      var target = $("<input data-bind='init: { convert: negate }, checked: visited' type='checkbox' checked='checked' />");
       var model = new ViewModel();
       ko.applyBindings(model, target[0]);
       expect($(target).attr('checked')).to.equal('checked');
@@ -333,7 +333,6 @@ describe("init binding", function () {
   describe("combined with visible binding", function () {
 
     describe("on visible element", function () {
-
       it("works with an observable", function () {
         var target = $("<span data-bind='init, visible: visited'>London</span>");
         var $template = target.appendTo(document.body);
@@ -365,7 +364,7 @@ describe("init binding", function () {
       });
 
       it("works with convert attribute", function () {
-        var target = $("<span data-bind='init: { field: visited, convert: function(x) { return !x; } }, visible: visited'>230</span>");
+        var target = $("<span data-bind='init: { field: visited, convert: negate }, visible: visited'>230</span>");
         var $template = target.appendTo(document.body);
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
@@ -375,7 +374,7 @@ describe("init binding", function () {
       });
 
       it("works with convert attribute without field", function () {
-        var target = $("<span data-bind='init: { convert: function(x) { return !x; } }, visible: visited'>230</span>");
+        var target = $("<span data-bind='init: { convert: negate }, visible: visited'>230</span>");
         var $template = target.appendTo(document.body);
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
@@ -386,7 +385,6 @@ describe("init binding", function () {
     });
 
     describe("on hidden element", function () {
-
       it("works with an observable", function () {
         var target = $("<span data-bind='init, visible: visited' style='display: none'>London</span>");
         var $template = target.appendTo(document.body);
@@ -418,7 +416,7 @@ describe("init binding", function () {
       });
 
       it("works with convert attribute", function () {
-        var target = $("<span data-bind='init: { field: visited, convert: function(x) { return !x; } }, visible: visited' style='display: none'>230</span>");
+        var target = $("<span data-bind='init: { field: visited, convert: negate }, visible: visited' style='display: none'>230</span>");
         var $template = target.appendTo(document.body);
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
@@ -428,7 +426,7 @@ describe("init binding", function () {
       });
 
       it("works with convert attribute without field", function () {
-        var target = $("<span data-bind='init: { convert: function(x) { return !x; } }, visible: visited' style='display: none'>230</span>");
+        var target = $("<span data-bind='init: { convert: negate }, visible: visited' style='display: none'>230</span>");
         var $template = target.appendTo(document.body);
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
@@ -441,43 +439,180 @@ describe("init binding", function () {
 
   describe("combined with html binding", function () {
     it("works with an observable", function () {
-        var target = $("<span data-bind='init, html: city'><i>London</i></span>");
+      var target = $("<span data-bind='init, html: city'><i>London</i></span>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('<i>London</i>');
+      expect(model.city()).to.equal('<i>London</i>');
+    });
+
+    it("works with a computed", function () {
+      var target = $("<span data-bind='init, html: cityComputed'><i>London</i></span>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('<i>London</i>');
+      expect(model.cityComputed()).to.equal('<i>London</i>');
+    });
+
+    it("works with field attribute", function () {
+      var target = $("<span data-bind='init: { field: city }, html: city'><i>London</i></span>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('<i>London</i>');
+      expect(model.city()).to.equal('<i>London</i>');
+    });
+
+    it("works with convert attribute", function () {
+      var target = $("<span data-bind='init: { field: city, convert: toUpperCase }, html: city'><i>London</i></span>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('<i>LONDON</i>');
+      expect(model.city()).to.equal('<I>LONDON</I>');
+    });
+
+    it("works with convert attribute without field", function () {
+      var target = $("<span data-bind='init: { convert: toUpperCase }, html: city'><i>London</i></span>");
+      var model = new ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('<i>LONDON</i>');
+      expect(model.city()).to.equal('<I>LONDON</I>');
+    });
+  });
+
+  describe("combined with enable binding", function () {
+
+    describe("on enabled element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<input data-bind='init, enable: visited' type='text' value='London' />");
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
-        expect($(target).html()).to.equal('<i>London</i>');
-        expect(model.city()).to.equal('<i>London</i>');
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
       });
 
       it("works with a computed", function () {
-        var target = $("<span data-bind='init, html: cityComputed'><i>London</i></span>");
+        var target = $("<input data-bind='init, enable: visitedComputed' type='text' value='London' />");
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
-        expect($(target).html()).to.equal('<i>London</i>');
-        expect(model.cityComputed()).to.equal('<i>London</i>');
+        expect($(target).val()).to.equal('London');
+        expect(model.visitedComputed()).to.be.true;
       });
 
       it("works with field attribute", function () {
-        var target = $("<span data-bind='init: { field: city }, html: city'><i>London</i></span>");
+        var target = $("<input data-bind='init: { field: visited }, enable: visited' type='text' value='London' />");
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
-        expect($(target).html()).to.equal('<i>London</i>');
-        expect(model.city()).to.equal('<i>London</i>');
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
       });
 
       it("works with convert attribute", function () {
-        var target = $("<span data-bind='init: { field: city, convert: function(x) { return x.toUpperCase(); } }, html: city'><i>London</i></span>");
+        var target = $("<input data-bind='init: { field: visited, convert: negate }, enable: visited' type='text' value='230' />");
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
-        expect($(target).html()).to.equal('<i>LONDON</i>');
-        expect(model.city()).to.equal('<I>LONDON</I>');
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.false;
       });
 
       it("works with convert attribute without field", function () {
-        var target = $("<span data-bind='init: { convert: function(x) { return x.toUpperCase(); } }, html: city'><i>London</i></span>");
+        var target = $("<input data-bind='init: { convert: negate }, enable: visited' type='text' value='230' />");
         var model = new ViewModel();
         ko.applyBindings(model, target[0]);
-        expect($(target).html()).to.equal('<i>LONDON</i>');
-        expect(model.city()).to.equal('<I>LONDON</I>');
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with input text element", function () {
+        var target = $("<input data-bind='init, enable: visited' type='text' value='London' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with input checkbox element", function () {
+        var target = $("<input data-bind='init, enable: visited' type='checkbox' checked='checked' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).attr('checked')).to.equal('checked');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with textarea element", function () {
+        var target = $("<textarea data-bind='init, enable: visited'>London</textarea>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
       });
     });
+
+    describe("on disabled element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<input data-bind='init, enable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with a computed", function () {
+        var target = $("<input data-bind='init, enable: visitedComputed' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visitedComputed()).to.be.false;
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<input data-bind='init: { field: visited }, enable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<input data-bind='init: { field: visited, convert: negate }, enable: visited' type='text' value='230' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<input data-bind='init: { convert: negate }, enable: visited' type='text' value='230' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with input text element", function () {
+        var target = $("<input data-bind='init, enable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with input checkbox element", function () {
+        var target = $("<input data-bind='init, enable: visited' type='checkbox' checked='checked' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).attr('checked')).to.equal('checked');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with textarea element", function () {
+        var target = $("<textarea data-bind='init, enable: visited' disabled>London</textarea>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+    });
+  });
 });
