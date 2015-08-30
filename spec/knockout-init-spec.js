@@ -615,4 +615,141 @@ describe("init binding", function () {
       });
     });
   });
+
+  describe("combined with disable binding", function () {
+
+    describe("on enabled element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<input data-bind='init, disable: visited' type='text' value='London' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with a computed", function () {
+        var target = $("<input data-bind='init, disable: visitedComputed' type='text' value='London' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visitedComputed()).to.be.false;
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<input data-bind='init: { field: visited }, disable: visited' type='text' value='London' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<input data-bind='init: { field: visited, convert: negate }, disable: visited' type='text' value='230' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<input data-bind='init: { convert: negate }, disable: visited' type='text' value='230' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with input text element", function () {
+        var target = $("<input data-bind='init, disable: visited' type='text' value='London' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with input checkbox element", function () {
+        var target = $("<input data-bind='init, disable: visited' type='checkbox' checked='checked' />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).attr('checked')).to.equal('checked');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with textarea element", function () {
+        var target = $("<textarea data-bind='init, disable: visited'>London</textarea>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.false;
+      });
+    });
+
+    describe("on disabled element", function () {
+
+      it("works with an observable", function () {
+        var target = $("<input data-bind='init, disable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with a computed", function () {
+        var target = $("<input data-bind='init, disable: visitedComputed' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visitedComputed()).to.be.true;
+      });
+
+      it("works with field attribute", function () {
+        var target = $("<input data-bind='init: { field: visited }, disable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with convert attribute", function () {
+        var target = $("<input data-bind='init: { field: visited, convert: negate }, disable: visited' type='text' value='230' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with convert attribute without field", function () {
+        var target = $("<input data-bind='init: { convert: negate }, disable: visited' type='text' value='230' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('230');
+        expect(model.visited()).to.be.false;
+      });
+
+      it("works with input text element", function () {
+        var target = $("<input data-bind='init, disable: visited' type='text' value='London' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with input checkbox element", function () {
+        var target = $("<input data-bind='init, disable: visited' type='checkbox' checked='checked' disabled />");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).attr('checked')).to.equal('checked');
+        expect(model.visited()).to.be.true;
+      });
+
+      it("works with textarea element", function () {
+        var target = $("<textarea data-bind='init, disable: visited' disabled>London</textarea>");
+        var model = new ViewModel();
+        ko.applyBindings(model, target[0]);
+        expect($(target).val()).to.equal('London');
+        expect(model.visited()).to.be.true;
+      });
+    });
+  });
 });
