@@ -1,7 +1,6 @@
 {
   "name": "knockout-pre-rendered",
-  "main": "dist",
-  "version": "0.6.0",
+  "main": "dist/knockout-pre-rendered.js",
   "homepage": "https://github.com/ErikSchierboom/knockout-pre-rendered",
   "authors": [
     "Erik Schierboom <erik_schierboom@hotmail.com>"
@@ -16,10 +15,8 @@
   ],
   "license": "Apache-2.0",
   "ignore": [
-    "**/*",
-    "node_modules",
-    "bower_components",
-    "tests"
+    "*",
+    "!dist/*"
   ],
   "dependencies": {
     "knockout": "^3.2.0"

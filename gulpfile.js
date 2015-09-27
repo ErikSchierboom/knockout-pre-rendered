@@ -3,7 +3,7 @@ var gulp    = require('gulp'),
     mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 function updateVersion(importance) {
-  return gulp.src(['./package.json', './bower.json'])
+  return gulp.src('./package.json')
     .pipe(plugins.bump({ type: importance }))
     .pipe(gulp.dest('./'));
 }
