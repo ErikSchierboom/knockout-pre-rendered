@@ -1,6 +1,6 @@
 {
   "name": "knockout-pre-rendered",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Knockout pre-rendered",
   "main": "dist/knockout-pre-rendered.js",
   "files": [
@@ -29,6 +29,8 @@
     "url": "https://github.com/ErikSchierboom/knockout-pre-rendered/issues"
   },
   "homepage": "https://github.com/ErikSchierboom/knockout-pre-rendered",
+  "registry": "npm",
+  "format": "global",
   "devDependencies": {
     "chai": "*",
     "gulp": "*",
