@@ -1,10 +1,14 @@
-function CityViewModel() {
+var ko = require('knockout');
+
+var Models = {};
+
+Models.CityViewModel = function() {
   var self = this;
 
   self.name = ko.observable();
 }
 
-function ViewModel() {
+Models.ViewModel = function() {
   var self = this;
 
   self.cities = ko.observableArray();
@@ -33,7 +37,7 @@ function ViewModel() {
   });
   
   self.createCity = function() {
-    return new CityViewModel();
+    return new Models.CityViewModel();
   };
 
   self.toUpperCase = function(str) {
@@ -44,3 +48,5 @@ function ViewModel() {
     return !bool;
   };
 }
+
+module.exports = Models;

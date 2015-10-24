@@ -1,5 +1,11 @@
-mocha.setup('bdd')
-var expect = chai.expect;
+require('./common.js');
+
+var expect = require('chai').expect;
+var ko = require('knockout');
+var Models = require('./models.js');
+var $ = require('jquery');
+
+require('../index.js');
 
 // Make the frame animation synchronous; simplifies testing.
 function setupSynchronousFrameAnimation () {
@@ -191,7 +197,7 @@ describe("foreachInit binding", function () {
                         "<li data-bind='init: name, text: name' data-init>Paris</li>" +
                         "<li data-bind='init: name, text: name' data-init>Amsterdam</li>" +
                       "</ul>");
-      var model = new ViewModel();
+      var model = new Models.ViewModel();
       ko.applyBindings(model, target[0]);
       expect(target.html()).to.equal('<li data-bind="init: name, text: name" data-init="">London</li>' + 
                                      '<li data-bind="init: name, text: name" data-init="">Paris</li>' +
@@ -357,9 +363,9 @@ describe("foreachInit binding", function () {
 
     beforeEach(function () {
       model = new ko.observableArray();
-      model.push(new CityViewModel());
-      model.push(new CityViewModel());
-      model.push(new CityViewModel());
+      model.push(new Models.CityViewModel());
+      model.push(new Models.CityViewModel());
+      model.push(new Models.CityViewModel());
     }); 
 
     it("works with init", function () {
@@ -498,11 +504,11 @@ describe("foreachInit binding", function () {
                       "<li data-init><span data-bind='text: $parent.city' /></li>" +
                       "<li data-init><span data-bind='text: $parent.city' /></li>" +
                     "</ul>");
-      var model = new ViewModel();
+      var model = new Models.ViewModel();
       model.city('New York')
-      model.cities.push(new CityViewModel());
-      model.cities.push(new CityViewModel());
-      model.cities.push(new CityViewModel());
+      model.cities.push(new Models.CityViewModel());
+      model.cities.push(new Models.CityViewModel());
+      model.cities.push(new Models.CityViewModel());
 
       ko.applyBindings(model, target[0]);
       expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' + 

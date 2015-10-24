@@ -1,6 +1,6 @@
 var gulp    = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    mochaPhantomJS = require('gulp-mocha-phantomjs');
+    mocha   = require('gulp-mocha');
 
 function updateVersion(importance) {
   return gulp.src('./package.json')
@@ -12,36 +12,30 @@ gulp.task('patch',   function() { return updateVersion('patch'); });
 gulp.task('feature', function() { return updateVersion('minor'); });
 gulp.task('release', function() { return updateVersion('major'); });
 
-gulp.task('webserver', function () {
-  return gulp.src('.')
-    .pipe(plugins.webserver({
-      port: 4054,
-      open: 'spec/runner.html'
-    }));
+gulp.task('test', function () {
+  return gulp.src('test/init-spec.js')
+             .pipe(mocha());
 });
 
-gulp.task('test', function () {
-  return gulp
-    .src('spec/runner.html')
-    .pipe(mochaPhantomJS());
+gulp.task('coverage', function () {
+  return gulp.src('test/init-spec.js')
+             .pipe(mocha({
+                reporter: 'html-cov',
+                require: ['blanket']
+              }));
 });
 
 gulp.task('js', function () {
   var pkg = require('./package.json');
 
   gulp.src("./index.js")
-    .pipe(plugins.replace('{{ version }}', pkg.version))
-    .pipe(plugins.rename('knockout-pre-rendered.js'))
-    .pipe(gulp.dest('./dist'))
-    .pipe(plugins.uglify())
-    .pipe(plugins.rename('knockout-pre-rendered.min.js'))
-    .pipe(gulp.dest('./dist'));
+      .pipe(plugins.replace('{{ version }}', pkg.version))
+      .pipe(plugins.rename('knockout-pre-rendered.js'))
+      .pipe(gulp.dest('./dist'))
+      .pipe(plugins.uglify())
+      .pipe(plugins.rename('knockout-pre-rendered.min.js'))
+      .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('watch', ['js'], function () {
-  gulp.watch(['index.js', 'spec/*'], ['js']);
-});
-
-gulp.task('live', ['watch', 'webserver']);
 gulp.task('ci', ['js', 'test']);
-gulp.task('default', ['live']);
+gulp.task('default', ['js']);
