@@ -28,12 +28,17 @@ gulp.task('coverage', function () {
 gulp.task('js', function () {
   var pkg = require('./package.json');
 
-  gulp.src("./index.js")
+  gulp.src("./knockout-pre-rendered.js")
       .pipe(plugins.replace('{{ version }}', pkg.version))
-      .pipe(plugins.rename('knockout-pre-rendered.js'))
       .pipe(gulp.dest('./dist'))
       .pipe(plugins.uglify())
       .pipe(plugins.rename('knockout-pre-rendered.min.js'))
+      .pipe(gulp.dest('./dist'));
+
+  gulp.src('./knockout-pre-rendered.d.ts')
+      .pipe(gulp.dest('./dist'));
+
+  gulp.src('./knockout.d.ts')
       .pipe(gulp.dest('./dist'));
 });
 

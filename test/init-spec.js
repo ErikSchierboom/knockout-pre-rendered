@@ -5,7 +5,7 @@ var ko = require('knockout');
 var Models = require('./models.js');
 var $ = require('jquery');
 
-require('../index.js');
+require('../knockout-pre-rendered.js');
 
 describe("init binding", function () {
 

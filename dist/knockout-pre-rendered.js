@@ -35,7 +35,7 @@
   }
 
   // From knockout/src/virtualElements.js
-  var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
+  var commentNodesHaveTextProperty = window.document && window.document.createComment("test").text === "<!--test-->";
   var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
   function isVirtualNode(node) {
     return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
