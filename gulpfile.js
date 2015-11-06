@@ -13,12 +13,12 @@ gulp.task('feature', function() { return updateVersion('minor'); });
 gulp.task('release', function() { return updateVersion('major'); });
 
 gulp.task('test', function () {
-  return gulp.src('test/init-spec.js')
+  return gulp.src('test/spec.js')
              .pipe(mocha());
 });
 
 gulp.task('coverage', function () {
-  return gulp.src('test/init-spec.js')
+  return gulp.src('test/spec.js')
              .pipe(mocha({
                 reporter: 'html-cov',
                 require: ['blanket']

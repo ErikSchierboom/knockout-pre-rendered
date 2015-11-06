@@ -1,11 +1,10 @@
 require('./common.js');
+require('../knockout-pre-rendered.js');
 
 var expect = require('chai').expect;
 var ko = require('knockout');
 var Models = require('./models.js');
 var $ = require('jquery');
-
-require('../knockout-pre-rendered.js');
 
 // Make the frame animation synchronous; simplifies testing.
 function setupSynchronousFrameAnimation () {
