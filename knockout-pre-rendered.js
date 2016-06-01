@@ -78,7 +78,7 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      parentNode = document.createElement('div');
+      parentNode = sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) ? document.createElement('tbody') : document.createElement('div');
       parentNode.innerHTML = sourceNode.innerHTML;
     } else {
       // Anything else e.g. <div>

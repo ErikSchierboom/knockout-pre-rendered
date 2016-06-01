@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.6.2
+  Knockout pre-rendered binding handlers v0.7.0
   By: Erik Schierboom (C) 2015
   License: Apache 2
 
@@ -78,7 +78,7 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      parentNode = document.createElement('div');
+      parentNode = sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) ? document.createElement('tbody') : document.createElement('div');
       parentNode.innerHTML = sourceNode.innerHTML;
     } else {
       // Anything else e.g. <div>
