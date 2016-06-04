@@ -224,6 +224,38 @@ function ForeachDynamicViewModel() {
 }
 ```
 
+### Processing data changes 
+
+The `foreachInit` binding does not immediately process changes. Instead, it queues all changes, which it then later processes all at once. If you want to do additional processing before or after each queue processing round, you can use the `beforeQueueFlush` and `afterQueueFlush` attributes:
+
+```html
+<ul data-bind="foreachInit: { data: persons, beforeQueueFlush: beforeQueue, afterQueueFlush: afterQueue }">  
+  <li data-template data-bind="text: name"></li>
+</ul>
+```
+
+Both attributes point to callback functions that are one argument: the change queue being processed. Each change item in this queue has three properties:
+
+* `index`: the index of the item in the underlying array.
+* `status`: indicates the status of the change item, either `existing`, `added` or `removed`.
+* `value`: the array item being processed.
+
+We can use these callbacks in our view model as follows:
+
+```javascript
+function ForeachQueueCallbackViewModel() {
+  this.persons = ko.observableArray();
+
+  this.beforeQueue = function(changeQueue) {
+    console.log(changeQueue.length + ' queued items will be processed');
+  }
+  
+  this.afterQueue = function(changeQueue) {
+    console.log(changeQueue.length + ' queued items have been processed');
+  }
+}
+```
+
 ## Installation
 The best way to install this library is using [Bower](http://bower.io/):
 
