@@ -291,6 +291,16 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2016-06-27</td>
+     <td>0.7.1</td>
+     <td>Fixed &lt;tr&gt; in &lt;script&gt; template bug.</td>
+  </tr>
+  <tr>
+     <td>2015-10-06</td>
+     <td>0.7.0</td>
+     <td>Fixed window.document bug.</td>
+  </tr>
+  <tr>
      <td>2015-08-30</td>
      <td>0.6.0</td>
      <td>Added support for `attr`, `html`, `visible`, `enable` and `disable` bindings.</td>
