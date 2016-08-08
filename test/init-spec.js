@@ -783,6 +783,14 @@ describe("init binding", function () {
       expect(model.link()).to.equal('http://www.google.com');
     });
 
+    it("ignores missing attribute", function () {
+      var target = $("<a data-bind='init, attr: { href: link, title: linkTitle }' href='http://www.google.com'>Google</a>");
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link()).to.equal('http://www.google.com');
+    });
+
     it("works with convert attribute", function () {
       var target = $("<a data-bind='init: { convert: toUpperCase }, attr: { href: link }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
       var model = new Models.ViewModel();

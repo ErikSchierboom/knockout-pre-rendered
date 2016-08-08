@@ -367,6 +367,10 @@
 
     for (var attribute in fieldValue) {
       if (fieldValue.hasOwnProperty(attribute)) {
+        if (valueElement.attributes[attribute] === undefined) {
+          continue;
+        }
+
         var attributeValue = valueElement.attributes[attribute].value;
 
         // If a convert function was passed, apply it to the field value.

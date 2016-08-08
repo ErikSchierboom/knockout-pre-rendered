@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.7.1
+  Knockout pre-rendered binding handlers v0.7.2
   By: Erik Schierboom (C) 2015
   License: Apache 2
 
@@ -367,6 +367,10 @@
 
     for (var attribute in fieldValue) {
       if (fieldValue.hasOwnProperty(attribute)) {
+        if (valueElement.attributes[attribute] === undefined) {
+          continue;
+        }
+
         var attributeValue = valueElement.attributes[attribute].value;
 
         // If a convert function was passed, apply it to the field value.
