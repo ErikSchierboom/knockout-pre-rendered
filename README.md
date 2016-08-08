@@ -291,6 +291,11 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2016-08-08</td>
+     <td>0.7.2</td>
+     <td>Fixed bug with missing attribute values.</td>
+  </tr>
+  <tr>
      <td>2016-06-27</td>
      <td>0.7.1</td>
      <td>Fixed &lt;tr&gt; in &lt;script&gt; template bug.</td>
