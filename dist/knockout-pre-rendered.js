@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.7.2
+  Knockout pre-rendered binding handlers v0.8.0
   By: Erik Schierboom (C) 2015
   License: Apache 2
 
@@ -120,6 +120,7 @@
     );
     this.afterQueueFlush = spec.afterQueueFlush;
     this.beforeQueueFlush = spec.beforeQueueFlush;
+    this.dataChanged = spec.dataChanged;
     this.changeQueue = [];
     this.lastNodesList = [];
     this.childContexts = [];
@@ -175,6 +176,10 @@
       changeMap[changeItem.status].push(changeItem);
     });
 
+    if (typeof this.dataChanged === 'function') {
+      this.dataChanged(changeMap);
+    }
+
     if (changeMap.deleted.length > 0) {
       this.changeQueue.push.apply(this.changeQueue, changeMap.deleted);
       this.changeQueue.push({status: 'clearDeletedIndexes'})
@@ -182,7 +187,7 @@
 
     this.changeQueue.push.apply(this.changeQueue, changeMap.existing);
     this.changeQueue.push.apply(this.changeQueue, changeMap.added);
-
+   
     // Once a change is registered, the ticking count-down starts for the processQueue.
     if (this.changeQueue.length > 0 && !this.rendering_queued) {
       this.rendering_queued = true;

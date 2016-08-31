@@ -226,15 +226,15 @@ function ForeachDynamicViewModel() {
 
 ### Processing data changes 
 
-The `foreachInit` binding does not immediately process changes. Instead, it queues all changes, which it then later processes all at once. If you want to do additional processing before or after each queue processing round, you can use the `beforeQueueFlush` and `afterQueueFlush` attributes:
+The `foreachInit` binding does not immediately process changes. Instead, it queues all changes, which it then later processes all at once. If you want to do additional processing before or after each queue processing round, you can use the `dataChanged`, `beforeQueueFlush` and `afterQueueFlush` attributes:
 
 ```html
-<ul data-bind="foreachInit: { data: persons, beforeQueueFlush: beforeQueue, afterQueueFlush: afterQueue }">  
+<ul data-bind="foreachInit: { data: persons, dataChanged: dataChanged, beforeQueueFlush: beforeQueue, afterQueueFlush: afterQueue }">  
   <li data-template data-bind="text: name"></li>
 </ul>
 ```
 
-Both attributes point to callback functions that are one argument: the change queue being processed. Each change item in this queue has three properties:
+All three attributes point to callback functions with one argument: the change queue being processed. Each change item in this queue has three properties:
 
 * `index`: the index of the item in the underlying array.
 * `status`: indicates the status of the change item, either `existing`, `added` or `removed`.
@@ -246,6 +246,12 @@ We can use these callbacks in our view model as follows:
 function ForeachQueueCallbackViewModel() {
   this.persons = ko.observableArray();
 
+  this.dataChanged = function(changes) {
+    console.log(changes.added.length + ' items have been added');
+    console.log(changes.existing.length + ' items were modified');
+    console.log(changes.deleted.length + ' items were deleted');
+  }
+
   this.beforeQueue = function(changeQueue) {
     console.log(changeQueue.length + ' queued items will be processed');
   }
@@ -255,6 +261,11 @@ function ForeachQueueCallbackViewModel() {
   }
 }
 ```
+
+There are two main differences between the `dataChanged` and `beforeQueue` callbacks:
+
+1. The `dataChanged` callback is also called upon initialization, when the input array may be empty.
+2. The `dataChanged` callback on receives the new changes that will be added to the queue, whereas `beforeQueue` will receive the complete queue. 
 
 ## Installation
 The best way to install this library is using [Bower](http://bower.io/):
@@ -289,6 +300,11 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2016-06-09</td>
+     <td>0.8.0</td>
+     <td>Added `dataChanged` callback.</td>
   </tr>
   <tr>
      <td>2016-08-08</td>
