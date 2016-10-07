@@ -63,7 +63,7 @@ describe("foreachInit binding", function () {
                                    '<li data-bind="text: $data" data-init="">16</li>');
   });
 
-  it("works with a computed observable", function () {
+  it("works with a read-only computed observable", function () {
     var target = $("<ul data-bind='foreachInit: $data'>" +
                       "<li data-bind='text: $data' data-template></li>" +
                       "<li data-bind='text: $data' data-init></li>" +
@@ -72,6 +72,36 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = [22, 23, 24];
     ko.applyBindings(ko.computed({read: function () { return list }}), target[0]);
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
+                                   '<li data-bind="text: $data" data-init="">23</li>' +
+                                   '<li data-bind="text: $data" data-init="">24</li>');
+  });
+
+  it("works with a read-write computed observable using a plain backing array", function () {
+    var target = $("<ul data-bind='foreachInit: $data'>" +
+                      "<li data-bind='text: $data' data-template></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                    "</ul>");
+    var list = [22, 23, 24];
+    var computedList = ko.computed({read: function () { return list }, write: function(value) { list = value }});
+    ko.applyBindings(computedList, target[0]);
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
+                                   '<li data-bind="text: $data" data-init="">23</li>' +
+                                   '<li data-bind="text: $data" data-init="">24</li>');
+  });
+
+  it("works with a read-write computed observable using a backing observable array", function () {
+    var target = $("<ul data-bind='foreachInit: $data'>" +
+                      "<li data-bind='text: $data' data-template></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                      "<li data-bind='text: $data' data-init></li>" +
+                    "</ul>");
+    var list = ko.observableArray([22, 23, 24]);
+    var computedList = ko.computed({read: function () { return list() }, write: function(value) { list(value) }});
+    ko.applyBindings(computedList, target[0]);
     expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
                                    '<li data-bind="text: $data" data-init="">23</li>' +
                                    '<li data-bind="text: $data" data-init="">24</li>');

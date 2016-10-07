@@ -302,6 +302,14 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2016-10-07</td>
+     <td>0.9.0</td>
+     <td>
+        More efficient setting of initial elements for backing observables.
+        Allow computed observables as backing.
+      </td>
+  </tr>
+  <tr>
      <td>2016-06-09</td>
      <td>0.8.0</td>
      <td>Added `dataChanged` callback.</td>

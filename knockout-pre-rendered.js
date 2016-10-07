@@ -112,6 +112,7 @@
     this.$context = spec.$context;
     this.data = spec.data;
     this.as = spec.as;
+    this.createElement = spec.createElement;
     this.noContext = spec.noContext;
     this.namedTemplate = spec.name !== undefined;
     this.templateNode = makeTemplateNode(
@@ -131,10 +132,8 @@
     this.existingElements = findChildren(this.container, this.namedTemplate ? null : 'data-init');
 
     // Check to see if we should manually create the array elements
-    if (typeof spec.createElement === 'function') {
-      ko.utils.arrayForEach(this.existingElements, function(existingElement) {
-        self.data.push(spec.createElement());
-      });
+    if (typeof this.createElement === 'function') {
+        this.createElements();
     }
 
     // Prime content
@@ -293,6 +292,25 @@
 
     this.indexesToDelete = [];
   };
+
+  // Create the elements in the data (observable) array for each of
+  // the existing elements
+  InitializedForeach.prototype.createElements = function () {
+      var elements = [];
+
+      for (var i = 0; i < this.existingElements.length; i++) {
+        elements.push(this.createElement());
+      }
+
+      if (ko.isObservable(this.data)) {
+        this.data(elements);
+      }
+      else {
+        ko.utils.arrayForEach(elements, function(element) {
+            this.data.push(element);
+        });
+      }      
+  }
 
   // This binding handler is similar to the regular foreach binding handler, but with
   // one major difference: it binds the underlying array to existing HTML elements instead
