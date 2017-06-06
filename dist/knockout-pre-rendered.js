@@ -401,6 +401,12 @@
         if (isPlainObject(value) && typeof value['convert'] === 'function') {
             attributeValue = value['convert'](attributeValue);
         }
+		
+		if (isPlainObject(value) && typeof value['convert'] === 'object') {
+                    if (typeof value['convert'][attribute] === 'function') {
+                        attributeValue = value['convert'][attribute](attributeValue);
+                    }
+                }
       
         fieldValue[attribute](attributeValue)
       }
@@ -421,12 +427,28 @@
                       allBindings.get('enable')  ? !valueElement.disabled :
                       allBindings.get('disable') ? valueElement.disabled :
                       (valueElement.innerText || valueElement.textContent || valueElement.value));
+	
+	var fieldValueName = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] :
+                             (allBindings.get('text') ?'text':
+                             allBindings.get('textInput') ? 'textInput':
+                             allBindings.get('value') ? 'value':
+                             allBindings.get('checked') ? 'checked':
+                             allBindings.get('html') ?'html':
+                             allBindings.get('visible') ? 'visible':
+                             allBindings.get('enable') ? 'enable':
+                             allBindings.get('disable')? 'disable':'');
 
       // If a convert function was passed, apply it to the field value.
       // This can be used to convert the input string to the correct field value
       if (isPlainObject(value) && typeof value['convert'] === 'function') {
           fieldValue = value['convert'](fieldValue);
       }
+	  
+	  if (isPlainObject(value) && typeof value['convert'] === 'object') {
+            if (typeof value['convert'][fieldValueName] === 'function') {
+                fieldValue = value['convert'][fieldValueName](fieldValue);
+            }
+        }
 
       // Find the field accessor. If the init binding does not point to an observable
       // or the field parameter doesn't, we try the text and value binding
