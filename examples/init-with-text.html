@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knockout pre-rendered: foreachInit</title>
+  
+  <link rel="stylesheet" href="shared/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="shared/style.css"></link>
+  
+  <script src="shared/knockout-debug.js"></script>
+  <script src="../dist/knockout-pre-rendered.js" type="text/javascript"></script>
+</head>
+<body>
+  <ul>
+    <li>
+      <label>Name:</label>
+      <span data-bind="init, text: name">Michael Jordan</span>
+    </li>
+    <li>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">198</span>cm
+    </li>
+    <li>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: parseDate }, text: dateOfBirth">February 17, 1963</span>
+    </li>
+    <li>
+      <label>View model:</label>
+      <pre data-bind="text: ko.toJSON(viewModel)"></pre>
+    </li>
+  </ul>
+
+  <script type="text/javascript">
+      function ViewModel() {
+        var self = this;
+        
+        self.name = ko.observable();
+        self.height = ko.observable();
+        self.dateOfBirth = ko.observable();
+
+        self.parseDate = function(value) {
+          return new Date(Date.parse(value));
+        }
+      }
+
+      var viewModel = new ViewModel();
+      ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>
