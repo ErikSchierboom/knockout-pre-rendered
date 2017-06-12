@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.9.1-beta
+  Knockout pre-rendered binding handlers v0.9.1
   By: Erik Schierboom (C) 2015
   License: Apache 2
 

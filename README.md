@@ -302,6 +302,13 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2017-06-12</td>
+     <td>0.9.1</td>
+     <td>
+        Fix virtual elements children bug.
+      </td>
+  </tr>
+  <tr>
      <td>2016-10-07</td>
      <td>0.9.0</td>
      <td>
