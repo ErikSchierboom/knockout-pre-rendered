@@ -129,7 +129,7 @@
     this.rendering_queued = false;
 
     // Find the existing elements that will be bound to the data array
-    this.existingElements = findChildren(this.container, this.namedTemplate ? null : 'data-init');
+    this.existingElements = findChildren(this.namedTemplate ? this.element : this.container, this.namedTemplate ? null : 'data-init');
 
     // Check to see if we should manually create the array elements
     if (typeof this.createElement === 'function') {
