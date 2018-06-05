@@ -68,8 +68,8 @@
   }
 
   // Get a copy of the template node of the given element,
-  // put them into a container, then remove the template node.
-  function makeTemplateNode(sourceNode, namedTemplate) {
+  // put them into a container, then (optionally) remove the template node.
+  function makeTemplateNode(sourceNode, namedTemplate, deleteTemplateNodes) {
     var container = document.createElement('div');
     var parentNode;
     var namedTemplate;
@@ -78,8 +78,16 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      parentNode = sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) ? document.createElement('tbody') : document.createElement('div');
-      parentNode.innerHTML = sourceNode.innerHTML;
+      if(sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g)) {
+        var div = document.createElement('div');
+        var tbl = "<table><tbody>" + sourceNode.innerHTML + "</tbody></table>";
+        div.innerHTML = tbl;
+        parentNode = div.firstChild.tBodies[0];
+      }
+      else {
+        parentNode = document.createElement('div');
+        parentNode.innerHTML = sourceNode.innerHTML;
+      }
     } else {
       // Anything else e.g. <div>
       parentNode = sourceNode;
@@ -89,8 +97,10 @@
     var template = findFirstChild(parentNode, namedTemplate ? null : 'data-template');
     container.insertBefore(template.cloneNode(true), null);
 
-    // Remove the template node
-    ko.removeNode(template);
+    if(deleteTemplateNodes) {
+      // Remove the template node
+      ko.removeNode(template);
+    }
 
     return container;
   }
@@ -116,8 +126,9 @@
     this.noContext = spec.noContext;
     this.namedTemplate = spec.name !== undefined;
     this.templateNode = makeTemplateNode(
-      spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element,
-      this.namedTemplate
+      spec.name ? document.getElementById(spec.name) : spec.element,
+      this.namedTemplate,
+      !spec.name // Only delete the template nodes if they're not coming from a named template.
     );
     this.afterQueueFlush = spec.afterQueueFlush;
     this.beforeQueueFlush = spec.beforeQueueFlush;
@@ -138,9 +149,8 @@
 
     // Prime content
     var primeData = ko.unwrap(this.data);
-    if (primeData.map) {
-      this.onArrayChange(primeData.map(valueToChangeAddExistingItem));
-    }
+    this.onArrayChange(ko.utils.arrayMap(primeData, valueToChangeAddExistingItem));
+  
 
     // Watch for changes
     if (ko.isObservable(this.data)) {
@@ -168,7 +178,7 @@
     var changeMap = {
       added: [],
       existing: [],
-      deleted: [],
+      deleted: []
     };
 
     ko.utils.arrayForEach(changeSet, function(changeItem) {
@@ -351,7 +361,7 @@
     },
 
     // Export for testing, debugging, and overloading.
-    InitializedForeach: InitializedForeach,
+    InitializedForeach: InitializedForeach
   };
 
   ko.virtualElements.allowedBindings.foreachInit = true;
