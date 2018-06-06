@@ -78,7 +78,7 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      if(sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g)) {
+      if (sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g)) {
         var div = document.createElement('div');
         var tbl = "<table><tbody>" + sourceNode.innerHTML + "</tbody></table>";
         div.innerHTML = tbl;
@@ -96,15 +96,18 @@
     // Find the template and add it to the container
     var template = findFirstChild(parentNode, namedTemplate ? null : 'data-template');
 
-    for(var i = 0, node = template; i < nodesPerElement; i++) {
+    for (var i = 0, node = template; i < nodesPerElement; i++) {
       var currentNode = node;
       container.insertBefore(node.cloneNode(true), null);
       // Find next element sibling. (Some older browsers don't support nextElementSibling).
-      do { node = node.nextElementSibling || node.nextSibling; } while(node && node.nodeType !== 1); 
+      do { 
+        node = node.nextElementSibling || node.nextSibling; 
+      } while(node && node.nodeType !== 1); 
+      
       // Remove current template node
-    if(deleteTemplateNodes) {
+      if (deleteTemplateNodes) {
         ko.removeNode(currentNode);
-    }
+      }
     }
     return container;
   }
