@@ -545,4 +545,140 @@ describe("foreachInit binding", function () {
                                      '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>');
     }); 
   });
+
+
+  describe("supports multiple HTML nodes per array element (nodesPerElement option)", function () {
+
+    var markup, model;
+
+    beforeEach(function () {
+      markup = $(
+        '<table>' + 
+            '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
+              // Template with two rows.
+              '<tr data-template>' +
+                '<td data-bind="text: firstname"></td>' +
+                '<td data-bind="text: lastname"></td>' +
+              '</tr>' +
+              '<tr data-template>' +
+                '<td colspan="2" data-bind="text: comment"></td>' +
+              '</tr>' +
+
+              // First record
+              '<tr data-init>' + 
+                '<td data-bind="init, text: firstname">Bob</td>' +
+                '<td data-bind="init, text: lastname">Smith</td>' +
+              '</tr>' +
+              '<tr data-init>' + 
+                '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
+              '</tr>' +
+
+              // Second record
+              '<tr data-init>' + 
+                '<td data-bind="init, text: firstname">Edward</td>' +
+                '<td data-bind="init, text: lastname">Johnson</td>' +
+              '</tr>' +
+              '<tr data-init>' + 
+                '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
+              '</tr>' +
+
+              // Third record
+              '<tr data-init>' + 
+                '<td data-bind="init, text: firstname">Mike</td>' +
+                '<td data-bind="init, text: lastname">Michaels</td>' +
+              '</tr>' +
+              '<tr data-init>' + 
+                '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
+              '</tr>' +
+
+          '</tbody>'+
+        '</table>');
+
+        model = { 
+            records: ko.observableArray(), 
+            createRecord: function (firstname, lastname, comment) { 
+                return { 
+                    firstname: ko.observable(firstname), 
+                    lastname: ko.observable(lastname), 
+                    comment: ko.observable(comment)
+                };
+            }     
+        };
+    });
+
+    it("initializes the correct number of array elements", function () {
+      var target = $(markup);
+      ko.applyBindings(model, target[0]);
+      expect(model.records().length).to.equal(3);
+    }); 
+
+    it("creates the correct markup when adding new records.", function () {
+      var target = $(markup);
+      ko.applyBindings(model, target[0]);
+      model.records.push( model.createRecord('Steve', 'Rogers', 'Not actually Captain America') );
+
+      expect(target.html()).to.equal(
+            '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
+              '<tr data-init="">' + 
+                '<td data-bind="init, text: firstname">Bob</td>' +
+                '<td data-bind="init, text: lastname">Smith</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td data-bind="init, text: firstname">Edward</td>' +
+                '<td data-bind="init, text: lastname">Johnson</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td data-bind="init, text: firstname">Mike</td>' +
+                '<td data-bind="init, text: lastname">Michaels</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
+              '</tr>' +
+              '<tr data-template="">' + 
+                '<td data-bind="text: firstname">Steve</td>' +
+                '<td data-bind="text: lastname">Rogers</td>' +
+              '</tr>' +
+              '<tr data-template="">' + 
+                '<td colspan="2" data-bind="text: comment">Not actually Captain America</td>' +
+              '</tr>' +
+            '</tbody>');
+    }); 
+
+    it("removes the correct markup when deleting records.", function () {
+      var target = $(markup);
+      ko.applyBindings(model, target[0]);
+      model.records.push( model.createRecord('Steve', 'Rogers', 'Not actually Captain America') );
+
+      // Remove a record from the top.
+      model.records.shift();
+
+      // Remove a record from the bottom
+      model.records.pop();
+
+      expect(target.html()).to.equal(
+            '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
+              '<tr data-init="">' + 
+                '<td data-bind="init, text: firstname">Edward</td>' +
+                '<td data-bind="init, text: lastname">Johnson</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td data-bind="init, text: firstname">Mike</td>' +
+                '<td data-bind="init, text: lastname">Michaels</td>' +
+              '</tr>' +
+              '<tr data-init="">' + 
+                '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
+              '</tr>' +
+            '</tbody>');
+    }); 
+
+  });
 });
