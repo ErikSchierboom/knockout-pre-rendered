@@ -102,8 +102,8 @@
       // Find next element sibling. (Some older browsers don't support nextElementSibling).
       do { 
         node = node.nextElementSibling || node.nextSibling; 
-      } while(node && node.nodeType !== 1); 
-      
+      } while (node && node.nodeType !== 1); 
+
       // Remove current template node
       if (deleteTemplateNodes) {
         ko.removeNode(currentNode);
@@ -235,7 +235,7 @@
   };
 
   InitializedForeach.prototype.createChildContext = function (index, value) {
-    if(this.noContext) {
+    if (this.noContext) {
       return this.$context.extend({
         '$item' : value
       });
@@ -251,7 +251,7 @@
     var context = this.childContexts[index] = this.createChildContext(index, value);
     var elementIndex = (index * this.nodesPerElement);
     var existingElement;
-    for(var i = 0; i < this.nodesPerElement; i++) {
+    for (var i = 0; i < this.nodesPerElement; i++) {
         existingElement = this.existingElements[elementIndex + i];
         ko.applyBindings(context, existingElement);
     }
