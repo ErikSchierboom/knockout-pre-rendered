@@ -1,5 +1,5 @@
 /*!
-  Knockout pre-rendered binding handlers v0.9.1
+  Knockout pre-rendered binding handlers v0.9.2
   By: Erik Schierboom (C) 2015
   License: Apache 2
 
@@ -69,7 +69,7 @@
 
   // Get a copy of the template node of the given element,
   // put them into a container, then remove the template node.
-  function makeTemplateNode(sourceNode, namedTemplate) {
+  function makeTemplateNode(sourceNode, namedTemplate, deleteTemplateNodes, nodesPerElement) {
     var container = document.createElement('div');
     var parentNode;
     var namedTemplate;
@@ -78,8 +78,16 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      parentNode = sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) ? document.createElement('tbody') : document.createElement('div');
-      parentNode.innerHTML = sourceNode.innerHTML;
+      if (sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g)) {
+        var div = document.createElement('div');
+        var tbl = "<table><tbody>" + sourceNode.innerHTML + "</tbody></table>";
+        div.innerHTML = tbl;
+        parentNode = div.firstChild.tBodies[0];
+      }
+      else {
+        parentNode = document.createElement('div');
+        parentNode.innerHTML = sourceNode.innerHTML;
+      }
     } else {
       // Anything else e.g. <div>
       parentNode = sourceNode;
@@ -87,11 +95,20 @@
 
     // Find the template and add it to the container
     var template = findFirstChild(parentNode, namedTemplate ? null : 'data-template');
-    container.insertBefore(template.cloneNode(true), null);
 
-    // Remove the template node
-    ko.removeNode(template);
+    for (var i = 0, node = template; i < nodesPerElement; i++) {
+      var currentNode = node;
+      container.insertBefore(node.cloneNode(true), null);
+      // Find next element sibling. (Some older browsers don't support nextElementSibling).
+      do { 
+        node = node.nextElementSibling || node.nextSibling; 
+      } while (node && node.nodeType !== 1); 
 
+      // Remove current template node
+      if (deleteTemplateNodes) {
+        ko.removeNode(currentNode);
+      }
+    }
     return container;
   }
 
@@ -115,9 +132,12 @@
     this.createElement = spec.createElement;
     this.noContext = spec.noContext;
     this.namedTemplate = spec.name !== undefined;
+    this.nodesPerElement = spec.nodesPerElement || 1;
     this.templateNode = makeTemplateNode(
-      spec.name ? document.getElementById(spec.name).cloneNode(true) : spec.element,
-      this.namedTemplate
+      spec.name ? document.getElementById(spec.name) : spec.element,
+      this.namedTemplate,
+      !spec.name, // Only delete the template nodes if they're not coming from a named template.
+      this.nodesPerElement
     );
     this.afterQueueFlush = spec.afterQueueFlush;
     this.beforeQueueFlush = spec.beforeQueueFlush;
@@ -138,9 +158,8 @@
 
     // Prime content
     var primeData = ko.unwrap(this.data);
-    if (primeData.map) {
-      this.onArrayChange(primeData.map(valueToChangeAddExistingItem));
-    }
+    this.onArrayChange(ko.utils.arrayMap(primeData, valueToChangeAddExistingItem));
+  
 
     // Watch for changes
     if (ko.isObservable(this.data)) {
@@ -168,7 +187,7 @@
     var changeMap = {
       added: [],
       existing: [],
-      deleted: [],
+      deleted: []
     };
 
     ko.utils.arrayForEach(changeSet, function(changeItem) {
@@ -216,7 +235,7 @@
   };
 
   InitializedForeach.prototype.createChildContext = function (index, value) {
-    if(this.noContext) {
+    if (this.noContext) {
       return this.$context.extend({
         '$item' : value
       });
@@ -229,10 +248,14 @@
 
   // Process a changeItem with {status: 'existing', ...}
   InitializedForeach.prototype.existing = function (index, value) {
-    var existingElement = this.existingElements[index];
+    var context = this.childContexts[index] = this.createChildContext(index, value);
+    var elementIndex = (index * this.nodesPerElement);
+    var existingElement;
+    for (var i = 0; i < this.nodesPerElement; i++) {
+        existingElement = this.existingElements[elementIndex + i];
+        ko.applyBindings(context, existingElement);
+    }
     this.lastNodesList.splice(index, 0, existingElement);
-    this.childContexts[index] = this.createChildContext(index, value);
-    ko.applyBindings(this.childContexts[index], existingElement);
   };
 
   // Process a changeItem with {status: 'added', ...}
@@ -298,7 +321,7 @@
   InitializedForeach.prototype.createElements = function () {
       var elements = [];
 
-      for (var i = 0; i < this.existingElements.length; i++) {
+      for (var i = 0; i < this.existingElements.length / this.nodesPerElement; i++) {
         elements.push(this.createElement());
       }
 
@@ -351,7 +374,7 @@
     },
 
     // Export for testing, debugging, and overloading.
-    InitializedForeach: InitializedForeach,
+    InitializedForeach: InitializedForeach
   };
 
   ko.virtualElements.allowedBindings.foreachInit = true;
