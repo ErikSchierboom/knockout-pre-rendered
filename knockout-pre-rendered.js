@@ -132,6 +132,57 @@
     'disable': true
   });
 
+  // KO's built-in "_twoWayBindings" logic can only carry us so far. For other bindings, 
+  // we need to generate our own property writers, in much the same way as KO does.
+
+  // Generate property writers for all properties referenced in an "attr" binding.
+  generatePropertyWritersForBinding("attr", "_ko_prerender_attrPropertyWriters", "attr");
+
+  // This method generates a binding preprocessor for the specified binding, and for each
+  // applicable field referenced in the binding params, it generates a writer.
+  function generatePropertyWritersForBinding(bindingName, propertyWritersBindingName, defaultWriterName, mapExpressionsCallback) {
+    // Chain this with any existing preprocessor.
+    var existingPreprocessor = ko.bindingHandlers[bindingName].preprocess;
+
+    ko.bindingHandlers[bindingName].preprocess = function (value, name, addBinding) {
+      if (existingPreprocessor) {
+        value = existingPreprocessor(value, name, addBinding);
+      }
+      var expressions = ko.expressionRewriting.parseObjectLiteral(value);
+      if (mapExpressionsCallback) {
+        expressions = ko.utils.arrayMap(expressions, mapExpressionsCallback);
+      }
+      var writers = [];
+      ko.utils.arrayForEach(expressions, function (expression) {
+        if (expression != null) {
+          var writableExpression = getWritableValue(("unknown" in expression) ? expression["unknown"] : expression.value);
+          if (writableExpression) {
+            writers.push(
+                "'" + (("unknown" in expression) ? defaultWriterName : expression.key) 
+                + "':function(_v){" + writableExpression + "=_v}"
+              );
+          }
+        }
+      });
+      if (writers.length != 0) {
+        addBinding(propertyWritersBindingName, "{" + writers.join(",") + "}");
+      }
+      return value || true;
+    }
+  }
+
+  // from knockout/src/binding/expressionRewriting.js
+  var javaScriptReservedWords = ["true", "false", "null", "undefined"];
+  var javaScriptAssignmentTarget = /^(?:[$_a-z][$\w]*|(.+)(\.\s*[$_a-z][$\w]*|\[.+\]))$/i;
+  function getWritableValue(expression) {
+    if (ko.utils.arrayIndexOf(javaScriptReservedWords, expression) == -1) {
+      var match = expression.match(javaScriptAssignmentTarget);
+      return match === null ? false : match[1] ? ('Object(' + match[1] + ')' + match[2]) : expression;
+    }
+    return false;
+  }
+
+
   function InitializedForeach(spec) {
     var self = this;
     this.element = spec.element;
