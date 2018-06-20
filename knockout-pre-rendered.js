@@ -121,6 +121,17 @@
     };
   }
 
+  // Knockout automatically generates "_ko_property_writers" for a subset of its
+  // built-in bindings, registered as "_twoWayBindings". Here, we can compel it to
+  // do the same for the rest of the bindings that we want to support with "init".
+  ko.utils.extend(ko.expressionRewriting._twoWayBindings, {
+    'text': true,
+    'html': true,
+    'visible': true,
+    'enable': true,
+    'disable': true
+  });
+
   function InitializedForeach(spec) {
     var self = this;
     this.element = spec.element;
