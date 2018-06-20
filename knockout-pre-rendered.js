@@ -453,10 +453,18 @@
            value['field'] === undefined;
   }
 
-  function setExplicitObjectValues(value, viewModel) {
+  function setExplicitObjectValues(value, viewModel, allBindings) {
+    var propertyWriters = allBindings.get("_ko_prerender_initPropertyWriters");
     for (var key in value) {
-      if (value.hasOwnProperty(key)) {
+      if (value.hasOwnProperty(key) && viewModel[key] instanceof Function) {
         viewModel[key](value[key]);
+      }
+      else if (propertyWriters) {
+        // Try to get the writer for the non-observable property.
+        var writer = propertyWriters[key];
+        if (writer) {
+          writer(value[key]);
+        }
       }
     }
   }
@@ -486,8 +494,18 @@
         if (isPlainObject(value) && typeof value['convert'] === 'function') {
             attributeValue = value['convert'](attributeValue);
         }
-      
-        fieldValue[attribute](attributeValue)
+
+        // First try to write to the value as an observable.
+        if (ko.isObservable(fieldValue[attribute])) {
+          fieldValue[attribute](attributeValue)
+        }
+        else {
+          // Otherwise, look for a suitable attribute property writer.
+          var writers = allBindings.get('_ko_prerender_attrPropertyWriters');
+          if (writers && writers[attribute]) {
+            writers[attribute](attributeValue);
+          }
+        }
       }
     }
   }
@@ -513,21 +531,38 @@
           fieldValue = value['convert'](fieldValue);
       }
 
-      // Find the field accessor. If the init binding does not point to an observable
-      // or the field parameter doesn't, we try the text and value binding
-      var fieldAccessor = (ko.isObservable(value) ? value : undefined) || 
-                          (isPlainObject(value) ? value['field'] : undefined) ||                             
-                           allBindings.get('text')      ||
-                           allBindings.get('textInput') ||
-                           allBindings.get('value')     ||
-                           allBindings.get('checked')   ||
-                           allBindings.get('html')      ||
-                           allBindings.get('visible')   ||
-                           allBindings.get('enable')    ||
-                           allBindings.get('disable');
+    // Look for property writers for explicit fields in the init binding.
+    var initPropertyWriters = allBindings.get('_ko_prerender_initPropertyWriters') || {};
+    // Look for property writers from knockout's built-in two-way bindings
+    var propertyWriters = allBindings.get("_ko_property_writers") || {};
 
-      // Finally, update the observable with the value
+    // Find the field accessor. If the init binding does not point to an observable
+    // or the field parameter doesn't, we try the text and value binding
+    var fieldAccessor = (!value && 'field' in initPropertyWriters) ? initPropertyWriters['field'] 
+                        : ko.isObservable(value) ? value 
+                        : (isPlainObject(value) && 'field' in value) ? 
+                              (ko.isObservable(value['field']) ? value['field'] 
+                              : initPropertyWriters['field']) 
+                        : undefined;
+
+    if (!fieldAccessor) {
+      var supportedBindings = ['text', 'textInput', 'value', 'checked', 'html', 'visible', 'enable', 'disable'];
+      for (var i = 0; i < supportedBindings.length && !fieldAccessor; i++) {
+        var bindingName = supportedBindings[i];
+        var accessor = allBindings.get(bindingName);
+        if(accessor && ko.isObservable(accessor)) {
+          fieldAccessor = accessor;
+        }
+        else if(bindingName in propertyWriters) {
+          fieldAccessor = propertyWriters[bindingName];
+        }
+      }
+    }
+
+    // Finally, set the field value.
+    if (fieldAccessor) {
       fieldAccessor(fieldValue, unwrappedValue);
+    }
   }
 
   // This binding handler initializes an observable to a value from the HTML element
@@ -537,16 +572,23 @@
       var value = valueAccessor();
       
       if (isObjectWithExplicitValues(value)) {
-        setExplicitObjectValues(value, viewModel);
+        setExplicitObjectValues(value, viewModel, allBindings);
       } 
       else if (hasAttributeBinding(allBindings)) {
         initAttributeObservables(element, value, allBindings);
       }
       else {
-        initObservable(element, value, allBindings)  
+        initObservable(element, value, allBindings);
       }
     }
   };
+
+  generatePropertyWritersForBinding("init", "_ko_prerender_initPropertyWriters", "field", function (expression) {
+    var key = expression.key;
+    return   key === "convert" || key === "value" ? null        //'convert' and 'value' do not reference writable fields
+           : key === undefined || key === "field" ? expression  // these should be left unchanged.
+           : { key: key, value: key };                          // for all others, the key should also be the value expression.
+  });
 
   ko.virtualElements.allowedBindings.init = true;
 }));
