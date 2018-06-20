@@ -183,12 +183,23 @@
   }
 
 
-  function InitializedForeach(spec) {
+  function InitializedForeach(element, valueAccessor, bindings, viewModel, context) {
     var self = this;
-    this.element = spec.element;
-    this.container = isVirtualNode(this.element) ?
-                     this.element.parentNode : this.element;
-    this.$context = spec.$context;
+    this.element = element;
+    this.container = isVirtualNode(element) ?
+                     this.element.parentNode : element;
+    this.$context = context;
+
+    var useRawData = false;  // If true, the binding received an array, rather than an object with a "data" property.
+    var spec = valueAccessor();
+    if (!isPlainObject(spec)) {
+      useRawData = (ko.unwrap(context.$rawData) === spec);
+      spec = {
+        data: useRawData ? context.$rawData : spec,
+        createElement: spec.createElement
+      };
+    }
+
     this.data = spec.data;
     this.as = spec.as;
     this.createElement = spec.createElement;
@@ -196,7 +207,7 @@
     this.namedTemplate = spec.name !== undefined;
     this.nodesPerElement = spec.nodesPerElement || 1;
     this.templateNode = makeTemplateNode(
-      spec.name ? document.getElementById(spec.name) : spec.element,
+      spec.name ? document.getElementById(spec.name) : element,
       this.namedTemplate,
       !spec.name, // Only delete the template nodes if they're not coming from a named template.
       this.nodesPerElement
@@ -221,16 +232,26 @@
     // Prime content
     var primeData = ko.unwrap(this.data);
     this.onArrayChange(ko.utils.arrayMap(primeData, valueToChangeAddExistingItem));
-  
 
-    // Watch for changes
-    if (ko.isObservable(this.data)) {
-      if (!this.data.indexOf) {
-        // Make sure the observable is trackable.
-        this.data = this.data.extend({trackArrayChanges: true});
+    // Use a ko.computed to as a means of subscribing to array changes via ko's dependency tracking magic.
+    // This works whether the array is a ko.observableArray, or a reactive ko-es5 property that wraps an 
+    // observableArray internally.
+    this.changeSubs = ko.computed( function () {
+      var value = useRawData ? context.$rawData : valueAccessor();
+      var newContents = ko.unwrap(isPlainObject(value) ? value.data : value);
+
+      // Since the array we're using isn't guaranteed to be an observableArray, we can't just call 
+      // .subscribe('arrayChange') on it to get change tracking notifications. So we need to track
+      // the before/after array contents explicitly, but can use knockout's own logic to get the 
+      // diffs between them.
+      if(this.previousContents != null) {
+        var diff = ko.utils.compareArrays(this.previousContents, newContents, { 'sparse': true });
+        if(diff.length != 0) {
+          self.onArrayChange(diff);
+        }
       }
-      this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
-    }
+      this.previousContents = [].concat(newContents);
+    }, { previousContents: null });
   }
 
   InitializedForeach.animateFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame ||
@@ -381,6 +402,7 @@
   // Create the elements in the data (observable) array for each of
   // the existing elements
   InitializedForeach.prototype.createElements = function () {
+      var self = this;
       var elements = [];
 
       for (var i = 0; i < this.existingElements.length / this.nodesPerElement; i++) {
@@ -392,7 +414,7 @@
       }
       else {
         ko.utils.arrayForEach(elements, function(element) {
-            this.data.push(element);
+            self.data.push(element);
         });
       }      
   }
@@ -412,21 +434,7 @@
     //    ko.computed
     //    {data: array, name: string, as: string}
     init: function init(element, valueAccessor, bindings, viewModel, context) {
-      var value = valueAccessor(),
-          initializedForeach;
-      
-      if (isPlainObject(value)) {
-        value.element = value.element || element;
-        value.$context = context;
-        initializedForeach = new InitializedForeach(value);
-      } else {
-        initializedForeach = new InitializedForeach({
-          element: element,
-          data: ko.unwrap(context.$rawData) === value ? context.$rawData : value,
-          $context: context,
-          createElement: value.createElement
-        });
-      }
+      var initializedForeach = new InitializedForeach(element, valueAccessor, bindings, viewModel, context);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         initializedForeach.dispose();
