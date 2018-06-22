@@ -155,10 +155,10 @@
       var writers = [];
       ko.utils.arrayForEach(expressions, function (expression) {
         if (expression != null) {
-          var writableExpression = getWritableValue(("unknown" in expression) ? expression["unknown"] : expression.value);
+          var writableExpression = getWritableValue("unknown" in expression ? expression["unknown"] : expression.value);
           if (writableExpression) {
             writers.push(
-                "'" + (("unknown" in expression) ? defaultWriterName : expression.key) 
+                "'" + ("unknown" in expression ? defaultWriterName : expression.key) 
                 + "':function(_v){" + writableExpression + "=_v}"
               );
           }
@@ -193,7 +193,7 @@
     var useRawData = false;  // If true, the binding received an array, rather than an object with a "data" property.
     var spec = valueAccessor();
     if (!isPlainObject(spec)) {
-      useRawData = (ko.unwrap(context.$rawData) === spec);
+      useRawData = ko.unwrap(context.$rawData) === spec;
       spec = {
         data: useRawData ? context.$rawData : spec,
         createElement: spec.createElement
@@ -242,7 +242,7 @@
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
     }
     else {
-      // If not observable, use a ko.computed to as a means of subscribing to array changes via
+      // If not observable, use a ko.computed as a means of subscribing to array changes via
       // ko's dependency tracking magic. This allows tracking of reactive ko-es5 property that
       // wraps an observableArray internally.
       this.changeSubs = ko.computed( function () {
@@ -556,11 +556,11 @@
 
     // Find the field accessor. If the init binding does not point to an observable
     // or the field parameter doesn't, we try the text and value binding
-    var fieldAccessor = (!value && 'field' in initPropertyWriters) ? initPropertyWriters['field'] 
+    var fieldAccessor = !value && 'field' in initPropertyWriters ? initPropertyWriters['field'] 
                         : ko.isObservable(value) ? value 
-                        : (isPlainObject(value) && 'field' in value) ? 
-                              (ko.isObservable(value['field']) ? value['field'] 
-                              : initPropertyWriters['field']) 
+                        : isPlainObject(value) && 'field' in value ? 
+                              ko.isObservable(value['field']) ? value['field'] 
+                              : initPropertyWriters['field'] 
                         : undefined;
 
     if (!fieldAccessor) {

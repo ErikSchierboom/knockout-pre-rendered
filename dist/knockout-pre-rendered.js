@@ -155,10 +155,10 @@
       var writers = [];
       ko.utils.arrayForEach(expressions, function (expression) {
         if (expression != null) {
-          var writableExpression = getWritableValue(("unknown" in expression) ? expression["unknown"] : expression.value);
+          var writableExpression = getWritableValue("unknown" in expression ? expression["unknown"] : expression.value);
           if (writableExpression) {
             writers.push(
-                "'" + (("unknown" in expression) ? defaultWriterName : expression.key) 
+                "'" + ("unknown" in expression ? defaultWriterName : expression.key) 
                 + "':function(_v){" + writableExpression + "=_v}"
               );
           }
@@ -193,7 +193,7 @@
     var useRawData = false;  // If true, the binding received an array, rather than an object with a "data" property.
     var spec = valueAccessor();
     if (!isPlainObject(spec)) {
-      useRawData = (ko.unwrap(context.$rawData) === spec);
+      useRawData = ko.unwrap(context.$rawData) === spec;
       spec = {
         data: useRawData ? context.$rawData : spec,
         createElement: spec.createElement
@@ -233,6 +233,7 @@
     var primeData = ko.unwrap(this.data);
     this.onArrayChange(ko.utils.arrayMap(primeData, valueToChangeAddExistingItem));
 
+    // If observable, subscribe to change notification the normal way.
     if (ko.isObservable(this.data)) {
       if (!this.data.indexOf) {
         // Make sure the observable is trackable.
@@ -241,14 +242,14 @@
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
     }
     else {
-      // Use a ko.computed to as a means of subscribing to array changes via ko's dependency tracking magic.
-      // This works whether the array is a ko.observableArray, or a reactive ko-es5 property that wraps an 
-      // observableArray internally.
+      // If not observable, use a ko.computed as a means of subscribing to array changes via
+      // ko's dependency tracking magic. This allows tracking of reactive ko-es5 property that
+      // wraps an observableArray internally.
       this.changeSubs = ko.computed( function () {
         var value = useRawData ? context.$rawData : valueAccessor();
         var newContents = ko.unwrap(isPlainObject(value) ? value.data : value);
 
-        // Since the array we're using isn't guaranteed to be an observableArray, we can't just call 
+        // Since we have no direct reference to the underlying observable (if any), we can't just call
         // .subscribe('arrayChange') on it to get change tracking notifications. So we need to track
         // the before/after array contents explicitly, but can use knockout's own logic to get the 
         // diffs between them.
@@ -555,11 +556,11 @@
 
     // Find the field accessor. If the init binding does not point to an observable
     // or the field parameter doesn't, we try the text and value binding
-    var fieldAccessor = (!value && 'field' in initPropertyWriters) ? initPropertyWriters['field'] 
+    var fieldAccessor = !value && 'field' in initPropertyWriters ? initPropertyWriters['field'] 
                         : ko.isObservable(value) ? value 
-                        : (isPlainObject(value) && 'field' in value) ? 
-                              (ko.isObservable(value['field']) ? value['field'] 
-                              : initPropertyWriters['field']) 
+                        : isPlainObject(value) && 'field' in value ? 
+                              ko.isObservable(value['field']) ? value['field'] 
+                              : initPropertyWriters['field'] 
                         : undefined;
 
     if (!fieldAccessor) {
