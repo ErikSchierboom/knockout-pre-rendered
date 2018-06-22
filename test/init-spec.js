@@ -142,6 +142,15 @@ describe("init binding", function () {
     expect(model.year()).to.equal(230);
   });
 
+  it("allows multiple fields to be initialized in a plain JS model", function () {
+    var target = $("<span data-bind='init: { city: \"London\", year: 230 }'></span>");
+    var model = new Models.PlainJSModel();
+    ko.applyBindings(model, target[0]);
+    expect($(target).html()).to.equal('');
+    expect(model.city).to.equal('London');
+    expect(model.year).to.equal(230);
+  });
+
   describe("combined with text binding", function () {
     it("works with an observable", function () {
       var target = $("<span data-bind='init, text: city'>London</span>");
@@ -191,6 +200,33 @@ describe("init binding", function () {
       expect(model.city()).to.equal('London');
       expect(model.year()).to.equal(0);
     });
+
+    it("works with plain JS (non-observable) property", function () {
+      var target = $("<span data-bind='init, text: city'>London</span>");
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect(model.city).to.equal('London');
+    });
+
+    it("allows init to work on with different non-observable in a plain JS model", function () {
+      var target = $("<span data-bind='init: { field: city }, text: year'>London</span>");
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('0');
+      expect(model.city).to.equal('London');
+      expect(model.year).to.equal(0);
+    });
+
+    it("works with ES5 'reactive' properties", function () {
+      var target = $("<span data-bind='init, text: city'>London</span>");
+      var model = new Models.Es5TrackedModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).html()).to.equal('London');
+      expect(model.city).to.equal('London');
+      model.city = 'France';
+      expect($(target).html()).to.equal('France');
+    });
+
   });
 
   describe("combined with textInput binding", function () {
@@ -767,6 +803,14 @@ describe("init binding", function () {
       expect(model.link()).to.equal('http://www.google.com');
     });
 
+    it("works with a plain JS property", function () {
+      var target = $("<a data-bind='init, attr: { href: link }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link).to.equal('http://www.google.com');
+    });
+
     it("works with a computed", function () {
       var target = $("<a data-bind='init, attr: { href: linkComputed }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
       var model = new Models.ViewModel();
@@ -807,5 +851,28 @@ describe("init binding", function () {
       expect(model.link()).to.equal('http://www.google.com');
       expect(model.linkTitle()).to.equal('Visit Google.com');
     });
+
+    it("works with multiple attributes with a plain JS model", function () {
+      var target = $("<a data-bind='init, attr: { href: link, title: linkTitle }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link).to.equal('http://www.google.com');
+      expect(model.linkTitle).to.equal('Visit Google.com');
+    });
+
+    it("works with multiple attributes with a reactive ES5 model", function () {
+      var target = $("<a data-bind='init, attr: { href: link, title: linkTitle }' href='http://www.google.com' title='Visit Google.com'>Google</a>");
+      var model = new Models.Es5TrackedModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal('Google');
+      expect(model.link).to.equal('http://www.google.com');
+      expect(model.linkTitle).to.equal('Visit Google.com');
+      model.link = 'http://github.com';
+      model.linkTitle = 'Visit GitHub!';
+      expect($(target).attr('href')).to.equal('http://github.com');
+      expect($(target).attr('title')).to.equal('Visit GitHub!');
+    });
+ 
   });
 });
