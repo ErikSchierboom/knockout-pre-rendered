@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knockout pre-rendered: foreachInit</title>
+  
+  <link rel="stylesheet" href="shared/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="shared/style.css"></link>
+  
+  <script src="shared/knockout-debug.js"></script>
+  <script src="shared/knockout-es5.js"></script>
+  <script src="../dist/knockout-pre-rendered.js" type="text/javascript"></script>
+</head>
+<body>
+  <p>
+      This example demonstrates binding to a model that uses the <a href="">knockout-es5</a> library,
+      so the model properties can be referenced as plain JS properties, but still behave as observables.
+  </p>
+  <ul data-bind="foreachInit: { data: persons, createElement: createPerson }">
+    <li data-template>
+      <label>Name:</label>
+      <span data-bind="text: name"></span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="text: height"></span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="text: dateOfBirth"></span>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label><span data-bind="init, text: name">Michael Jordan</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">198</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">February 17, 1963</span>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label>
+      <span data-bind="init, text: name">Larry Bird</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">206</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">December 7, 1956</span>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label>
+      <span data-bind="init, text: name">Magic Johnson</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">206</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">August 14, 1959</span>
+    </li>
+  </ul>
+  
+  <h3>Add new person</h3>
+  
+  <form class="form-horizontal col-sm-4" action="#">
+    <ul>
+      <li>
+        <label>Name</label>
+        <input class="form-control" type="text" data-bind="value: newName" placeholder="Name" />
+      </li>
+      <li>
+        <label>Height</label>
+        <input class="form-control" type="text" data-bind="value: newHeight" placeholder="Height" />
+      </li>
+      <li>
+        <label>Date of birth</label>
+        <input class="form-control" type="text" data-bind="value: newDateOfBirth" placeholder="Date of birth" />
+      </li>
+      <li>
+        <button class="form-control" data-bind="click: addPerson">Add person</button>
+      </li>
+    </ul>
+  </form>
+  
+  <p>View model:</p>
+  <pre data-bind="text: ko.toJSON(viewModel)"></pre>
+
+  <script type="text/javascript">
+      function PersonViewModel(name, height, dateOfBirth) {
+          var self = this;
+          
+          self.name = name;
+          self.height = height;
+          self.dateOfBirth = dateOfBirth;
+
+          // Turns the properties of this model into ES5 getters/setters that wrap observables.
+          ko.track(this);
+        }
+
+        function ViewModel() {
+          var self = this;
+          
+          self.persons = [];
+
+          self.parseDate = function(value) {
+              var date = new Date(Date.parse(value));
+              return date.toLocaleDateString();
+          };
+          
+          self.addPerson = function() {
+              var newPerson = new PersonViewModel(
+              self.newName,
+              self.newHeight,
+              self.newDateOfBirth);
+              self.persons.push(newPerson);
+          };
+          
+          self.newName = "";
+          self.newHeight = "";
+          self.newDateOfBirth = "";
+
+          self.createPerson = function () { 
+            return new PersonViewModel(); 
+          }
+
+          // Turns the properties of this model into ES5 getters/setters that wrap observables.
+          ko.track(this);
+        }
+
+        var viewModel = new ViewModel();
+
+        ko.applyBindings(viewModel);
+    </script>
+</body>
+</html>

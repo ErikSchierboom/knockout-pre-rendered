@@ -8,3 +8,6 @@ pre {
 th, td {
     padding: 5px;
 }
+button {
+    display: block;
+}

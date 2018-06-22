@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knockout pre-rendered: foreachInit</title>
+  
+  <link rel="stylesheet" href="shared/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="shared/style.css"></link>
+  
+  <script src="shared/knockout-debug.js"></script>
+  <script src="../dist/knockout-pre-rendered.js" type="text/javascript"></script>
+</head>
+<body>
+  <p>
+      This example demonstrates how the init and foreachInit bindings can build up a 
+      plain JS (non-observable) model.
+      This is useful for pages where the content is generally static, but you want
+      to attach some behavior to existing state.
+  </p>
+  <ul data-bind="foreachInit: { data: persons, createElement: createPerson }">
+    <li data-template>
+      <label>Name:</label>
+      <span data-bind="text: name"></span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="text: height"></span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="text: dateOfBirth"></span>
+      <button data-bind="click: greet">Greet</button>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label><span data-bind="init, text: name">Michael Jordan</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">198</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">February 17, 1963</span>
+      <button data-bind="click: greet">Greet</button>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label>
+      <span data-bind="init, text: name">Larry Bird</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">206</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">December 7, 1956</span>
+      <button data-bind="click: greet">Greet</button>
+    </li>
+    
+    <li data-init>
+      <label>Name:</label>
+      <span data-bind="init, text: name">Magic Johnson</span>
+      <br/>
+      <label>Height:</label>
+      <span data-bind="init: { convert: parseInt }, text: height">206</span>cm
+      <br/>
+      <label>Date of birth:</label>
+      <span data-bind="init: { convert: $root.parseDate }, text: dateOfBirth">August 14, 1959</span>
+      <button data-bind="click: greet">Greet</button>
+    </li>
+  </ul>
+
+  <p>View model:</p>
+  <pre id="jsonText"></pre>
+
+  <script type="text/javascript">
+      function PersonViewModel(name, height, dateOfBirth) {
+          var self = this;
+          
+          self.name = name;
+          self.height = height;
+          self.dateOfBirth = dateOfBirth;
+
+          self.greet = function() {
+            alert("Hello " + self.name + "!");
+          }
+        }
+
+        function ViewModel() {
+          var self = this;
+          
+          self.persons = [];
+
+          self.createPerson = function () { 
+            return new PersonViewModel(); 
+          }
+
+          self.parseDate = function(value) {
+              var date = new Date(Date.parse(value));
+              return date.toLocaleDateString();
+          };
+        }
+
+        var viewModel = new ViewModel();
+
+        ko.applyBindings(viewModel);
+
+        setTimeout(function () {
+          document.getElementById("jsonText").innerText = ko.toJSON(viewModel);
+        }, 0);
+    </script>
+</body>
+</html>
