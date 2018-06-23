@@ -2,7 +2,7 @@ require('./common.js');
 require('../knockout-pre-rendered.js');
 
 var expect = require('chai').expect;
-var ko = require('knockout');
+var ko = require('knockout-es5');
 var Models = require('./models.js');
 var $ = require('jquery');
 
@@ -387,6 +387,162 @@ describe("foreachInit binding", function () {
     });
   });
 
+  describe("ES5 reactive array changes", function () {
+    var div, view;
+
+    beforeEach(function () {
+      div = $("<div data-bind='foreachInit: data'>" + 
+                "<i data-template data-bind='text: $data'></i>" + 
+                "<i data-init data-bind='text: $data'></i>" +
+              "</div>");
+      view = ko.track({data: []});
+    });
+
+    it("adds an item to an empty list", function () {
+      ko.applyBindings(view, div[0]);
+      view.data = ['a'];
+      expect(div.text()).to.equal('a');
+    });
+
+    it("adds an item to the end of a pre-existing list", function () {
+      view.data = ['a']
+      ko.applyBindings(view, div[0]);
+      view.data.push('b');
+      expect(div.text()).to.equal('ab');
+    });
+
+    it("adds an item to the beginning of a pre-existing list", function () {
+      view.data = ['a']
+      ko.applyBindings(view, div[0]);
+      view.data.unshift('b');
+      expect(div.text()).to.equal('ba');
+    });
+
+    it("adds an item to the middle of a pre-existing list", function () {
+      div = $("<div data-bind='foreachInit: data'>" + 
+                "<i data-template data-bind='text: $data'></i>" + 
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+              "</div>");
+      view.data = ['a', 'b']
+      ko.applyBindings(view, div[0]);
+      view.data.splice(1, 0, 'c');
+      expect(div.text()).to.equal('acb');
+    });
+
+    it("deletes the last item", function () {
+      view.data = ['a']
+      ko.applyBindings(view, div[0]);
+      view.data = [];
+      expect(div.text()).to.equal('');
+    });
+
+    it("deletes from the beginning", function () {
+      div = $("<div data-bind='foreachInit: data'>" + 
+                "<i data-template data-bind='text: $data'></i>" + 
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+              "</div>");
+      view.data = ['a', 'b', 'c']
+      ko.applyBindings(view, div[0]);
+      view.data.shift();
+      expect(div.text()).to.equal('bc');
+    });
+
+    it("deletes from the beginning", function () {
+      div = $("<div data-bind='foreachInit: data'>" + 
+                "<i data-template data-bind='text: $data'></i>" + 
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+              "</div>");
+      view.data = ['a', 'b', 'c']
+      ko.applyBindings(view, div[0]);
+      view.data.pop();
+      expect(div.text()).to.equal('ab');
+    });
+
+    it("combines multiple adds and deletes", function () {
+      div = $("<div data-bind='foreachInit: data'>" + 
+                "<i data-template data-bind='text: $data'></i>" + 
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+                "<i data-init data-bind='text: $data'></i>" +
+              "</div>");
+      view.data = ['A', 'B', 'C', 'D', 'E', 'F'];
+      ko.applyBindings(view, div[0]);
+      view.data = ['x', 'B', 'C', 'D', 'z', 'F'];
+      expect(div.text()).to.equal('xBCDzF');
+    });
+
+    it("processes multiple deletes", function () {
+      // Per issue #6
+      ko.applyBindings(view, div[0]);
+      view.data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('0123456789');
+      view.data = [1, 2, 3, 4, 5, 6, 7, 8];
+      expect(div.text()).to.equal('12345678');
+      view.data = [2, 3, 4, 5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('23456789');
+      view.data = [3, 4, 5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('3456789');
+      view.data = [2, 3, 4, 5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('23456789');
+      view.data = [6, 7, 8, 9];
+      expect(div.text()).to.equal('6789');
+      view.data = [1, 2, 3, 6, 7, 8];
+      expect(div.text()).to.equal('123678');
+      view.data = [0, 1, 2, 3, 4];
+      expect(div.text()).to.equal('01234');
+      view.data = [1, 2, 3, 4];
+      expect(div.text()).to.equal('1234');
+      view.data = [3, 4];
+      expect(div.text()).to.equal('34');
+      view.data = [3];
+      expect(div.text()).to.equal('3');
+      view.data = [];
+      expect(div.text()).to.equal('');
+    });
+
+    it("processes numerous changes", function () {
+      ko.applyBindings(view, div[0]);
+      view.data = [5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('56789');
+      view.data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+      expect(div.text()).to.equal('0123456789');
+      view.data = ['a', 'b', 'c'];
+      expect(div.text()).to.equal('abc');
+    });
+
+    it("accepts changes via a computed es5 property", function() {
+      var target = $("<div data-bind='foreachInit: list'>" + 
+                        "<i data-template data-bind='text: $data'></i>" + 
+                        "<i data-init data-bind='text: $data'></i>" +
+                        "<i data-init data-bind='text: $data'></i>" +
+                        "<i data-init data-bind='text: $data'></i>" +
+                      "</div>");
+
+      var list1 = [1, 2, 3];
+      var list2 = [1, 2, 3, 4, 5, 6];
+      var es5Model = ko.track({ 
+        toggle: true
+      });
+      ko.defineProperty(es5Model, "list", function () {
+        return this.toggle ? list1 : list2;
+      });
+      ko.applyBindings(es5Model, target[0]);
+      expect(target.text()).to.equal("123");
+      es5Model.toggle  = false;
+      expect(target.text()).to.equal("123456");
+    });
+
+ });
+
+  
   describe("combined with nested initializers", function () {
     var model;
 

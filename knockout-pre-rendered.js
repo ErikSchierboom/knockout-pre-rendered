@@ -121,12 +121,85 @@
     };
   }
 
-  function InitializedForeach(spec) {
+  // Knockout automatically generates "_ko_property_writers" for a subset of its
+  // built-in bindings, registered as "_twoWayBindings". Here, we can compel it to
+  // do the same for the rest of the bindings that we want to support with "init".
+  ko.utils.extend(ko.expressionRewriting._twoWayBindings, {
+    'text': true,
+    'html': true,
+    'visible': true,
+    'enable': true,
+    'disable': true
+  });
+
+  // KO's built-in "_twoWayBindings" logic can only carry us so far. For other bindings, 
+  // we need to generate our own property writers, in much the same way as KO does.
+
+  // Generate property writers for all properties referenced in an "attr" binding.
+  generatePropertyWritersForBinding("attr", "_ko_prerender_attrPropertyWriters", "attr");
+
+  // This method generates a binding preprocessor for the specified binding, and for each
+  // applicable field referenced in the binding params, it generates a writer.
+  function generatePropertyWritersForBinding(bindingName, propertyWritersBindingName, defaultWriterName, mapExpressionsCallback) {
+    // Chain this with any existing preprocessor.
+    var existingPreprocessor = ko.bindingHandlers[bindingName].preprocess;
+
+    ko.bindingHandlers[bindingName].preprocess = function (value, name, addBinding) {
+      if (existingPreprocessor) {
+        value = existingPreprocessor(value, name, addBinding);
+      }
+      var expressions = ko.expressionRewriting.parseObjectLiteral(value);
+      if (mapExpressionsCallback) {
+        expressions = ko.utils.arrayMap(expressions, mapExpressionsCallback);
+      }
+      var writers = [];
+      ko.utils.arrayForEach(expressions, function (expression) {
+        if (expression != null) {
+          var writableExpression = getWritableValue("unknown" in expression ? expression["unknown"] : expression.value);
+          if (writableExpression) {
+            writers.push(
+                "'" + ("unknown" in expression ? defaultWriterName : expression.key) 
+                + "':function(_v){" + writableExpression + "=_v}"
+              );
+          }
+        }
+      });
+      if (writers.length != 0) {
+        addBinding(propertyWritersBindingName, "{" + writers.join(",") + "}");
+      }
+      return value || true;
+    }
+  }
+
+  // from knockout/src/binding/expressionRewriting.js
+  var javaScriptReservedWords = ["true", "false", "null", "undefined"];
+  var javaScriptAssignmentTarget = /^(?:[$_a-z][$\w]*|(.+)(\.\s*[$_a-z][$\w]*|\[.+\]))$/i;
+  function getWritableValue(expression) {
+    if (ko.utils.arrayIndexOf(javaScriptReservedWords, expression) == -1) {
+      var match = expression.match(javaScriptAssignmentTarget);
+      return match === null ? false : match[1] ? ('Object(' + match[1] + ')' + match[2]) : expression;
+    }
+    return false;
+  }
+
+
+  function InitializedForeach(element, valueAccessor, bindings, viewModel, context) {
     var self = this;
-    this.element = spec.element;
-    this.container = isVirtualNode(this.element) ?
-                     this.element.parentNode : this.element;
-    this.$context = spec.$context;
+    this.element = element;
+    this.container = isVirtualNode(element) ?
+                     this.element.parentNode : element;
+    this.$context = context;
+
+    var useRawData = false;  // If true, the binding received an array, rather than an object with a "data" property.
+    var spec = valueAccessor();
+    if (!isPlainObject(spec)) {
+      useRawData = ko.unwrap(context.$rawData) === spec;
+      spec = {
+        data: useRawData ? context.$rawData : spec,
+        createElement: spec.createElement
+      };
+    }
+
     this.data = spec.data;
     this.as = spec.as;
     this.createElement = spec.createElement;
@@ -134,7 +207,7 @@
     this.namedTemplate = spec.name !== undefined;
     this.nodesPerElement = spec.nodesPerElement || 1;
     this.templateNode = makeTemplateNode(
-      spec.name ? document.getElementById(spec.name) : spec.element,
+      spec.name ? document.getElementById(spec.name) : element,
       this.namedTemplate,
       !spec.name, // Only delete the template nodes if they're not coming from a named template.
       this.nodesPerElement
@@ -159,15 +232,35 @@
     // Prime content
     var primeData = ko.unwrap(this.data);
     this.onArrayChange(ko.utils.arrayMap(primeData, valueToChangeAddExistingItem));
-  
 
-    // Watch for changes
+    // If observable, subscribe to change notification the normal way.
     if (ko.isObservable(this.data)) {
       if (!this.data.indexOf) {
         // Make sure the observable is trackable.
         this.data = this.data.extend({trackArrayChanges: true});
       }
       this.changeSubs = this.data.subscribe(this.onArrayChange, this, 'arrayChange');
+    }
+    else {
+      // If not observable, use a ko.computed as a means of subscribing to array changes via
+      // ko's dependency tracking magic. This allows tracking of reactive ko-es5 property that
+      // wraps an observableArray internally.
+      this.changeSubs = ko.computed( function () {
+        var value = useRawData ? context.$rawData : valueAccessor();
+        var newContents = ko.unwrap(isPlainObject(value) ? value.data : value);
+
+        // Since we have no direct reference to the underlying observable (if any), we can't just call
+        // .subscribe('arrayChange') on it to get change tracking notifications. So we need to track
+        // the before/after array contents explicitly, but can use knockout's own logic to get the 
+        // diffs between them.
+        if(this.previousContents != null) {
+          var diff = ko.utils.compareArrays(this.previousContents, newContents, { 'sparse': true });
+          if(diff.length != 0) {
+            self.onArrayChange(diff);
+          }
+        }
+        this.previousContents = [].concat(newContents);
+      }, { previousContents: null });
     }
   }
 
@@ -319,6 +412,7 @@
   // Create the elements in the data (observable) array for each of
   // the existing elements
   InitializedForeach.prototype.createElements = function () {
+      var self = this;
       var elements = [];
 
       for (var i = 0; i < this.existingElements.length / this.nodesPerElement; i++) {
@@ -330,7 +424,7 @@
       }
       else {
         ko.utils.arrayForEach(elements, function(element) {
-            this.data.push(element);
+            self.data.push(element);
         });
       }      
   }
@@ -350,21 +444,7 @@
     //    ko.computed
     //    {data: array, name: string, as: string}
     init: function init(element, valueAccessor, bindings, viewModel, context) {
-      var value = valueAccessor(),
-          initializedForeach;
-      
-      if (isPlainObject(value)) {
-        value.element = value.element || element;
-        value.$context = context;
-        initializedForeach = new InitializedForeach(value);
-      } else {
-        initializedForeach = new InitializedForeach({
-          element: element,
-          data: ko.unwrap(context.$rawData) === value ? context.$rawData : value,
-          $context: context,
-          createElement: value.createElement
-        });
-      }
+      var initializedForeach = new InitializedForeach(element, valueAccessor, bindings, viewModel, context);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         initializedForeach.dispose();
@@ -391,10 +471,18 @@
            value['field'] === undefined;
   }
 
-  function setExplicitObjectValues(value, viewModel) {
+  function setExplicitObjectValues(value, viewModel, allBindings) {
+    var propertyWriters = allBindings.get("_ko_prerender_initPropertyWriters");
     for (var key in value) {
-      if (value.hasOwnProperty(key)) {
+      if (value.hasOwnProperty(key) && viewModel[key] instanceof Function) {
         viewModel[key](value[key]);
+      }
+      else if (propertyWriters) {
+        // Try to get the writer for the non-observable property.
+        var writer = propertyWriters[key];
+        if (writer) {
+          writer(value[key]);
+        }
       }
     }
   }
@@ -424,8 +512,18 @@
         if (isPlainObject(value) && typeof value['convert'] === 'function') {
             attributeValue = value['convert'](attributeValue);
         }
-      
-        fieldValue[attribute](attributeValue)
+
+        // First try to write to the value as an observable.
+        if (ko.isObservable(fieldValue[attribute])) {
+          fieldValue[attribute](attributeValue)
+        }
+        else {
+          // Otherwise, look for a suitable attribute property writer.
+          var writers = allBindings.get('_ko_prerender_attrPropertyWriters');
+          if (writers && writers[attribute]) {
+            writers[attribute](attributeValue);
+          }
+        }
       }
     }
   }
@@ -451,21 +549,38 @@
           fieldValue = value['convert'](fieldValue);
       }
 
-      // Find the field accessor. If the init binding does not point to an observable
-      // or the field parameter doesn't, we try the text and value binding
-      var fieldAccessor = (ko.isObservable(value) ? value : undefined) || 
-                          (isPlainObject(value) ? value['field'] : undefined) ||                             
-                           allBindings.get('text')      ||
-                           allBindings.get('textInput') ||
-                           allBindings.get('value')     ||
-                           allBindings.get('checked')   ||
-                           allBindings.get('html')      ||
-                           allBindings.get('visible')   ||
-                           allBindings.get('enable')    ||
-                           allBindings.get('disable');
+    // Look for property writers for explicit fields in the init binding.
+    var initPropertyWriters = allBindings.get('_ko_prerender_initPropertyWriters') || {};
+    // Look for property writers from knockout's built-in two-way bindings
+    var propertyWriters = allBindings.get("_ko_property_writers") || {};
 
-      // Finally, update the observable with the value
+    // Find the field accessor. If the init binding does not point to an observable
+    // or the field parameter doesn't, we try the text and value binding
+    var fieldAccessor = !value && 'field' in initPropertyWriters ? initPropertyWriters['field'] 
+                        : ko.isObservable(value) ? value 
+                        : isPlainObject(value) && 'field' in value ? 
+                              ko.isObservable(value['field']) ? value['field'] 
+                              : initPropertyWriters['field'] 
+                        : undefined;
+
+    if (!fieldAccessor) {
+      var supportedBindings = ['text', 'textInput', 'value', 'checked', 'html', 'visible', 'enable', 'disable'];
+      for (var i = 0; i < supportedBindings.length && !fieldAccessor; i++) {
+        var bindingName = supportedBindings[i];
+        var accessor = allBindings.get(bindingName);
+        if(accessor && ko.isObservable(accessor)) {
+          fieldAccessor = accessor;
+        }
+        else if(bindingName in propertyWriters) {
+          fieldAccessor = propertyWriters[bindingName];
+        }
+      }
+    }
+
+    // Finally, set the field value.
+    if (fieldAccessor) {
       fieldAccessor(fieldValue, unwrappedValue);
+    }
   }
 
   // This binding handler initializes an observable to a value from the HTML element
@@ -475,16 +590,23 @@
       var value = valueAccessor();
       
       if (isObjectWithExplicitValues(value)) {
-        setExplicitObjectValues(value, viewModel);
+        setExplicitObjectValues(value, viewModel, allBindings);
       } 
       else if (hasAttributeBinding(allBindings)) {
         initAttributeObservables(element, value, allBindings);
       }
       else {
-        initObservable(element, value, allBindings)  
+        initObservable(element, value, allBindings);
       }
     }
   };
+
+  generatePropertyWritersForBinding("init", "_ko_prerender_initPropertyWriters", "field", function (expression) {
+    var key = expression.key;
+    return   key === "convert" || key === "value" ? null        //'convert' and 'value' do not reference writable fields
+           : key === undefined || key === "field" ? expression  // these should be left unchanged.
+           : { key: key, value: key };                          // for all others, the key should also be the value expression.
+  });
 
   ko.virtualElements.allowedBindings.init = true;
 }));

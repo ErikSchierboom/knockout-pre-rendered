@@ -1,4 +1,4 @@
-var ko = require('knockout');
+var ko = require('knockout-es5');
 
 var Models = {};
 
@@ -48,5 +48,29 @@ Models.ViewModel = function() {
     return !bool;
   };
 }
+
+Models.PlainJSModel = function() {
+  var self = this;
+
+  self.cities = [];
+  self.city = '';
+  self.link = '';
+  self.linkTitle = '';
+  self.year = 0;
+}
+
+
+Models.Es5TrackedModel = function() {
+  var self = this;
+
+  self.cities = [];
+  self.city = '';
+  self.link = '';
+  self.linkTitle = '';
+  self.year = 0;
+
+  ko.track(self);
+}
+
 
 module.exports = Models;
