@@ -308,6 +308,13 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2018-06-23</td>
+     <td>0.10.0</td>
+     <td>
+        Support plain JS and ko-es5 models. (by <a href="https://github.com/revengineering">revengineering</a>).
+      </td>
+  </tr>
+  <tr>
      <td>2018-06-06</td>
      <td>0.9.2</td>
      <td>
