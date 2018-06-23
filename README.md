@@ -1,6 +1,6 @@
 # Knockout pre-rendered binding handlers
 
-[![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered) 
+[![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered)
 [![npm version](https://badge.fury.io/js/knockout-pre-rendered.svg)](http://badge.fury.io/js/knockout-pre-rendered)
 [![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
 [![Build status](https://ci.appveyor.com/api/projects/status/b3mfjd4ofs9dsv1w?svg=true)](https://ci.appveyor.com/project/ErikSchierboom/knockout-pre-rendered)
@@ -27,9 +27,9 @@ Normally, you'd bind the `name` observable to an HTML element as follows:
 <span data-bind="text: name">Michael Jordan</span>
 ```
 
-Once the binding has been applied however, the text within the `<span>` element will be cleared, as the bound observable did not have a value (existing HTML content is ignored). 
+Once the binding has been applied however, the text within the `<span>` element will be cleared, as the bound observable did not have a value (existing HTML content is ignored).
 
-We can fix this by specifying the `init` binding handler *before* the `text` binding handler:
+We can fix this by specifying the `init` binding handler _before_ the `text` binding handler:
 
 ```html
 <span data-bind="init, text: name">Michael Jordan</span>
@@ -46,7 +46,8 @@ You can combine the `init` handler with any binding, as long as you ensure that 
 <input data-bind="init, value: name" value="Larry Bird" type="text" />
 ```
 
-### Converting 
+### Converting
+
 By default, the `init` binding will set the observable's value to a string. If you want to convert to a different type, you can specify a convert function:
 
 ```html
@@ -65,7 +66,7 @@ function CustomConvertViewModel() {
 
   this.parseDate = function(innerText) {
     return new Date(Date.parse(innerText));
-  }
+  };
 }
 ```
 
@@ -133,6 +134,7 @@ The `init` binding can be used with the following bindings:
 - `disable`: the value is set to `true` if the bound element has a `disabled` attribute; otherwise, it is set to `true`.
 
 ## Foreach init binding
+
 This binding handler wraps the `foreach` binding, but instead of creating new HTML elements, it binds to existing HTML elements. Consider the following view model:
 
 ```javascript
@@ -162,11 +164,12 @@ We can bind the elements in the `persons` observable array to existing HTML elem
 
 There are several things to note:
 
-1. There must be one child element with the `data-template` attribute. This element will be used as the template when new items are added to the array.
-2. Elements to be bound to array items must have the `data-init` attribute.
-3. You can use the `init` binding handler to initialize the array items themselves.
+1.  There must be one child element with the `data-template` attribute. This element will be used as the template when new items are added to the array.
+2.  Elements to be bound to array items must have the `data-init` attribute.
+3.  You can use the `init` binding handler to initialize the array items themselves.
 
 ### Template
+
 You can also use a template that is defined elsewhere on the page:
 
 ```html
@@ -195,7 +198,7 @@ function ForeachDynamicViewModel() {
 
   this.addPerson = function() {
     this.persons.push(new PersonViewModel());
-  }
+  };
 }
 ```
 
@@ -220,11 +223,11 @@ function ForeachDynamicViewModel() {
 
   this.createPerson = function() {
     return new PersonViewModel();
-  }
+  };
 }
 ```
 
-### Processing data changes 
+### Processing data changes
 
 The `foreachInit` binding does not immediately process changes. Instead, it queues all changes, which it then later processes all at once. If you want to do additional processing before or after each queue processing round, you can use the `dataChanged`, `beforeQueueFlush` and `afterQueueFlush` attributes:
 
@@ -236,9 +239,9 @@ The `foreachInit` binding does not immediately process changes. Instead, it queu
 
 All three attributes point to callback functions with one argument: the change queue being processed. Each change item in this queue has three properties:
 
-* `index`: the index of the item in the underlying array.
-* `status`: indicates the status of the change item, either `existing`, `added` or `removed`.
-* `value`: the array item being processed.
+- `index`: the index of the item in the underlying array.
+- `status`: indicates the status of the change item, either `existing`, `added` or `removed`.
+- `value`: the array item being processed.
 
 We can use these callbacks in our view model as follows:
 
@@ -247,27 +250,28 @@ function ForeachQueueCallbackViewModel() {
   this.persons = ko.observableArray();
 
   this.dataChanged = function(changes) {
-    console.log(changes.added.length + ' items have been added');
-    console.log(changes.existing.length + ' items were modified');
-    console.log(changes.deleted.length + ' items were deleted');
-  }
+    console.log(changes.added.length + " items have been added");
+    console.log(changes.existing.length + " items were modified");
+    console.log(changes.deleted.length + " items were deleted");
+  };
 
   this.beforeQueue = function(changeQueue) {
-    console.log(changeQueue.length + ' queued items will be processed');
-  }
-  
+    console.log(changeQueue.length + " queued items will be processed");
+  };
+
   this.afterQueue = function(changeQueue) {
-    console.log(changeQueue.length + ' queued items have been processed');
-  }
+    console.log(changeQueue.length + " queued items have been processed");
+  };
 }
 ```
 
 There are two main differences between the `dataChanged` and `beforeQueue` callbacks:
 
-1. The `dataChanged` callback is also called upon initialization, when the input array may be empty.
-2. The `dataChanged` callback on receives the new changes that will be added to the queue, whereas `beforeQueue` will receive the complete queue. 
+1.  The `dataChanged` callback is also called upon initialization, when the input array may be empty.
+2.  The `dataChanged` callback on receives the new changes that will be added to the queue, whereas `beforeQueue` will receive the complete queue.
 
 ## Installation
+
 The best way to install this library is using [Bower](http://bower.io/):
 
     bower install knockout-pre-rendered
@@ -279,6 +283,7 @@ You can also install the library using NPM:
 The library is also available from a [CDN](https://cdnjs.com/libraries/knockout-pre-rendered).
 
 ## Demos
+
 There is a JSBin demo for each of the binding handlers:
 
 - [`foreachInit` binding](http://jsbin.com/nocaro)
@@ -295,6 +300,7 @@ There is a JSBin demo for each of the binding handlers:
 - [`init` binding](http://jsbin.com/wikaji/)
 
 ## History
+
 <table>
   <tr>
      <th>Date</th>
@@ -305,7 +311,7 @@ There is a JSBin demo for each of the binding handlers:
      <td>2018-06-06</td>
      <td>0.9.2</td>
      <td>
-        Added nodesPerElement option.
+        Added nodesPerElement option. (by <a href="https://github.com/revengineering">revengineering</a>)<br/>
         Fixed some browser compatibility bugs.
       </td>
   </tr>
@@ -320,7 +326,7 @@ There is a JSBin demo for each of the binding handlers:
      <td>2016-10-07</td>
      <td>0.9.0</td>
      <td>
-        More efficient setting of initial elements for backing observables.
+        More efficient setting of initial elements for backing observables.<br/>
         Allow computed observables as backing.
       </td>
   </tr>
@@ -405,7 +411,9 @@ There is a JSBin demo for each of the binding handlers:
 </table>
 
 ## Acknowledgements
+
 Many thanks go out to [Brian M Hunt](https://github.com/brianmhunt), which [`fastForEach` binding handler](https://github.com/brianmhunt/knockout-fast-foreach) formed the basis of the `foreachInit` binding handler.
 
 ## License
+
 [Apache License 2.0](LICENSE)
