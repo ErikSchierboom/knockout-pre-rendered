@@ -23,7 +23,7 @@
 }(this, function (ko) {
   // index.js
   // --------
-  // Pre-rendered binding handlers. 
+  // Pre-rendered binding handlers.
   // --------
   "use strict";
 
@@ -49,10 +49,10 @@
   // Check if a node is a valid child node
   function isValidChildNode(attribute, childNode) {
       if (typeof (attribute) === 'string') {
-        return isElementNode(childNode) && childNode.attributes && childNode.attributes[attribute];  
+        return isElementNode(childNode) && childNode.attributes && childNode.attributes[attribute];
       }
 
-      return isElementNode(childNode);    
+      return isElementNode(childNode);
   }
 
   // Find the first children of the specified parent node. If the attribute is defined, the child node
@@ -78,11 +78,10 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-      if (sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g)) {
-        var div = document.createElement('div');
-        var tbl = "<table><tbody>" + sourceNode.innerHTML + "</tbody></table>";
-        div.innerHTML = tbl;
-        parentNode = div.firstChild.tBodies[0];
+        if (sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) && !sourceNode.innerHTML.match(/<table[\s\S]*?<\/table>/g)) {
+            var tbl = document.createElement('table');
+            tbl.innerHTML = "<tbody>" + sourceNode.innerHTML + "</tbody>";
+            parentNode = tbl.firstChild;
       }
       else {
         parentNode = document.createElement('div');
@@ -100,9 +99,9 @@
       var currentNode = node;
       container.insertBefore(node.cloneNode(true), null);
       // Find next element sibling. (Some older browsers don't support nextElementSibling).
-      do { 
-        node = node.nextElementSibling || node.nextSibling; 
-      } while (node && node.nodeType !== 1); 
+      do {
+        node = node.nextElementSibling || node.nextSibling;
+      } while (node && node.nodeType !== 1);
 
       // Remove current template node
       if (deleteTemplateNodes) {
@@ -132,7 +131,7 @@
     'disable': true
   });
 
-  // KO's built-in "_twoWayBindings" logic can only carry us so far. For other bindings, 
+  // KO's built-in "_twoWayBindings" logic can only carry us so far. For other bindings,
   // we need to generate our own property writers, in much the same way as KO does.
 
   // Generate property writers for all properties referenced in an "attr" binding.
@@ -158,7 +157,7 @@
           var writableExpression = getWritableValue("unknown" in expression ? expression["unknown"] : expression.value);
           if (writableExpression) {
             writers.push(
-                "'" + ("unknown" in expression ? defaultWriterName : expression.key) 
+                "'" + ("unknown" in expression ? defaultWriterName : expression.key)
                 + "':function(_v){" + writableExpression + "=_v}"
               );
           }
@@ -251,7 +250,7 @@
 
         // Since we have no direct reference to the underlying observable (if any), we can't just call
         // .subscribe('arrayChange') on it to get change tracking notifications. So we need to track
-        // the before/after array contents explicitly, but can use knockout's own logic to get the 
+        // the before/after array contents explicitly, but can use knockout's own logic to get the
         // diffs between them.
         if(this.previousContents != null) {
           var diff = ko.utils.compareArrays(this.previousContents, newContents, { 'sparse': true });
@@ -298,7 +297,7 @@
 
     this.changeQueue.push.apply(this.changeQueue, changeMap.existing);
     this.changeQueue.push.apply(this.changeQueue, changeMap.added);
-   
+
     // Once a change is registered, the ticking count-down starts for the processQueue.
     if (this.changeQueue.length > 0 && !this.rendering_queued) {
       this.rendering_queued = true;
@@ -383,7 +382,7 @@
     } while (ptr && ptr !== lastNode);
 
     // The "last node" in the DOM from which we begin our deletes of the next adjacent node is
-    // now the sibling that preceded the first node of this item. 
+    // now the sibling that preceded the first node of this item.
     this.lastNodesList[index] = this.lastNodesList[index - 1];
     this.indexesToDelete.push(index);
   };
@@ -397,14 +396,14 @@
     for (var i = this.indexesToDelete.length - 1; i >= 0; --i) {
       this.lastNodesList.splice(this.indexesToDelete[i], 1);
       this.childContexts.splice(this.indexesToDelete[i], 1);
-    }  
+    }
 
     // Having deleted items means we need to update the index observables
-    for (var j = this.childContexts.length - 1; j >= 0; --j) {      
+    for (var j = this.childContexts.length - 1; j >= 0; --j) {
       if (this.childContexts[j] && this.childContexts[j]['$index']) {
         this.childContexts[j]['$index'](j);
       }
-    }  
+    }
 
     this.indexesToDelete = [];
   };
@@ -426,14 +425,14 @@
         ko.utils.arrayForEach(elements, function(element) {
             self.data.push(element);
         });
-      }      
+      }
   }
 
   // This binding handler is similar to the regular foreach binding handler, but with
   // one major difference: it binds the underlying array to existing HTML elements instead
   // of creating new elements. Existing elements must be marked with the "data-init" attribute.
   // What happens is that when the foreachInit binding handler is initialized, it will look for
-  // all child elements with the "data-init" attribute and bind them to the values in the 
+  // all child elements with the "data-init" attribute and bind them to the values in the
   // underlying (observable) array. To be able to support adding new items, there must be a template.
   // This template is found by looking for a mode marked with the "data-template" attribute.
   ko.bindingHandlers.foreachInit = {
@@ -460,12 +459,12 @@
   ko.virtualElements.allowedBindings.foreachInit = true;
 
   function elementIsHidden(element) {
-    return (element.offsetWidth <= 0 && element.offsetHeight <= 0) || 
+    return (element.offsetWidth <= 0 && element.offsetHeight <= 0) ||
            (element.style && element.style.display && element.style.display == 'none');
   }
 
   function isObjectWithExplicitValues(value) {
-    return isPlainObject(value) && 
+    return isPlainObject(value) &&
            value['value'] === undefined &&
            value['convert'] === undefined &&
            value['field'] === undefined;
@@ -530,13 +529,13 @@
 
   function initObservable(element, value, allBindings) {
   // Determine the element from which to retrieve the value
-    var valueElement = isVirtualNode(element) ? ko.virtualElements.firstChild(element) : element;  
+    var valueElement = isVirtualNode(element) ? ko.virtualElements.firstChild(element) : element;
     var unwrappedValue = ko.utils.peekObservable(value)
 
     // Get the actual value from the element. If the binding handler does not
     // have an explicit value, try to retrieve it from the value of inner text content
-    var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] : 
-                     (allBindings.get('checked') ? valueElement.checked : 
+    var fieldValue = (isPlainObject(value) && value['value'] !== undefined) ? value['value'] :
+                     (allBindings.get('checked') ? valueElement.checked :
                       allBindings.get('visible') ? !elementIsHidden(valueElement) :
                       allBindings.get('html')    ? valueElement.innerHTML :
                       allBindings.get('enable')  ? !valueElement.disabled :
@@ -556,11 +555,11 @@
 
     // Find the field accessor. If the init binding does not point to an observable
     // or the field parameter doesn't, we try the text and value binding
-    var fieldAccessor = !value && 'field' in initPropertyWriters ? initPropertyWriters['field'] 
-                        : ko.isObservable(value) ? value 
-                        : isPlainObject(value) && 'field' in value ? 
-                              ko.isObservable(value['field']) ? value['field'] 
-                              : initPropertyWriters['field'] 
+    var fieldAccessor = !value && 'field' in initPropertyWriters ? initPropertyWriters['field']
+                        : ko.isObservable(value) ? value
+                        : isPlainObject(value) && 'field' in value ?
+                              ko.isObservable(value['field']) ? value['field']
+                              : initPropertyWriters['field']
                         : undefined;
 
     if (!fieldAccessor) {
@@ -588,10 +587,10 @@
 
     init: function (element, valueAccessor, allBindings, viewModel) {
       var value = valueAccessor();
-      
+
       if (isObjectWithExplicitValues(value)) {
         setExplicitObjectValues(value, viewModel, allBindings);
-      } 
+      }
       else if (hasAttributeBinding(allBindings)) {
         initAttributeObservables(element, value, allBindings);
       }
