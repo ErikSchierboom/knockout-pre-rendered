@@ -30,7 +30,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = [1, 2, 3];
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">1</li>' +
                                    '<li data-bind="text: $data" data-init="">2</li>' +
                                    '<li data-bind="text: $data" data-init="">3</li>');
   });
@@ -44,7 +44,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = [6, 7, 8];
     ko.applyBindings(ko.observableArray(list), target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">6</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">6</li>' +
                                    '<li data-bind="text: $data" data-init="">7</li>' +
                                    '<li data-bind="text: $data" data-init="">8</li>');
   });
@@ -58,7 +58,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = [14, 15, 16];
     ko.applyBindings(ko.observable(list), target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">14</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">14</li>' +
                                    '<li data-bind="text: $data" data-init="">15</li>' +
                                    '<li data-bind="text: $data" data-init="">16</li>');
   });
@@ -72,7 +72,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = [22, 23, 24];
     ko.applyBindings(ko.computed({read: function () { return list }}), target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' +
                                    '<li data-bind="text: $data" data-init="">23</li>' +
                                    '<li data-bind="text: $data" data-init="">24</li>');
   });
@@ -87,7 +87,7 @@ describe("foreachInit binding", function () {
     var list = [22, 23, 24];
     var computedList = ko.computed({read: function () { return list }, write: function(value) { list = value }});
     ko.applyBindings(computedList, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' +
                                    '<li data-bind="text: $data" data-init="">23</li>' +
                                    '<li data-bind="text: $data" data-init="">24</li>');
   });
@@ -102,7 +102,7 @@ describe("foreachInit binding", function () {
     var list = ko.observableArray([22, 23, 24]);
     var computedList = ko.computed({read: function () { return list() }, write: function(value) { list(value) }});
     ko.applyBindings(computedList, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">22</li>' +
                                    '<li data-bind="text: $data" data-init="">23</li>' +
                                    '<li data-bind="text: $data" data-init="">24</li>');
   });
@@ -116,7 +116,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
     var list = ['a', 'b', 'c'];
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">a</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">a</li>' +
                                    '<li data-bind="text: $data" data-init="">b</li>' +
                                    '<li data-bind="text: $data" data-init="">c</li>');
   });
@@ -136,7 +136,7 @@ describe("foreachInit binding", function () {
   });
 
   it("works with virtual elements", function () {
-    var target = $("<div><!-- ko foreachInit: $data -->" + 
+    var target = $("<div><!-- ko foreachInit: $data -->" +
                      "<em data-template data-bind='text: $data'></em>" +
                      "<em data-init data-bind='text: $data'></em>" +
                      "<em data-init data-bind='text: $data'></em>" +
@@ -158,7 +158,7 @@ describe("foreachInit binding", function () {
     var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' +
                                    '<li data-bind="text: $data">F2</li>');
     $template.remove();
   });
@@ -172,7 +172,7 @@ describe("foreachInit binding", function () {
     var $template = $("<script type='text/ko-template' id='tID'><li data-bind='text: $data'></li></script>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">G1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data" data-init="">G1</li>' +
                                    '<li data-bind="text: $data" data-init="">G2</li>');
     $template.remove();
   });
@@ -186,7 +186,7 @@ describe("foreachInit binding", function () {
     var $template = $("<div id='tID2'><li data-bind='text: $data'><!--/ko--></div>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data">H1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data">H1</li>' +
                                    '<li data-bind="text: $data">H2</li>');
     $template.remove();
   });
@@ -200,7 +200,7 @@ describe("foreachInit binding", function () {
     var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' +
                                    '<li data-bind="text: $data">F2</li>');
     $template.remove();
   });
@@ -214,7 +214,7 @@ describe("foreachInit binding", function () {
     var $template = $("<template id='tID'><li data-bind='text: $data'></li><!--/ko--></template>")
       .appendTo(document.body)
     ko.applyBindings(list, target[0]);
-    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' + 
+    expect(target.html()).to.equal('<li data-bind="text: $data">F1</li>' +
                                    '<li data-bind="text: $data">F2</li>');
     $template.remove();
   });
@@ -228,7 +228,7 @@ describe("foreachInit binding", function () {
                       "</ul>");
       var model = new Models.ViewModel();
       ko.applyBindings(model, target[0]);
-      expect(target.html()).to.equal('<li data-bind="init: name, text: name" data-init="">London</li>' + 
+      expect(target.html()).to.equal('<li data-bind="init: name, text: name" data-init="">London</li>' +
                                      '<li data-bind="init: name, text: name" data-init="">Paris</li>' +
                                      '<li data-bind="init: name, text: name" data-init="">Amsterdam</li>');
       expect(model.cities()[0].name()).to.equal('London');
@@ -240,8 +240,8 @@ describe("foreachInit binding", function () {
     var div, obs, view;
 
     beforeEach(function () {
-      div = $("<div data-bind='foreachInit: obs'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: obs'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
               "</div>");
       obs = ko.observableArray();
@@ -269,8 +269,8 @@ describe("foreachInit binding", function () {
     });
 
     it("adds an item to the middle of a pre-existing list", function () {
-      div = $("<div data-bind='foreachInit: obs'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: obs'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
               "</div>");
@@ -288,8 +288,8 @@ describe("foreachInit binding", function () {
     });
 
     it("deletes from the beginning", function () {
-      div = $("<div data-bind='foreachInit: obs'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: obs'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -301,8 +301,8 @@ describe("foreachInit binding", function () {
     });
 
     it("deletes from the beginning", function () {
-      div = $("<div data-bind='foreachInit: obs'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: obs'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -314,8 +314,8 @@ describe("foreachInit binding", function () {
     });
 
     it("combines multiple adds and deletes", function () {
-      div = $("<div data-bind='foreachInit: obs'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: obs'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -369,8 +369,8 @@ describe("foreachInit binding", function () {
     });
 
     it("accepts changes via a computed observable", function() {
-      var target = $("<div data-bind='foreachInit: $data'>" + 
-                        "<i data-template data-bind='text: $data'></i>" + 
+      var target = $("<div data-bind='foreachInit: $data'>" +
+                        "<i data-template data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
@@ -391,8 +391,8 @@ describe("foreachInit binding", function () {
     var div, view;
 
     beforeEach(function () {
-      div = $("<div data-bind='foreachInit: data'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: data'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
               "</div>");
       view = ko.track({data: []});
@@ -419,8 +419,8 @@ describe("foreachInit binding", function () {
     });
 
     it("adds an item to the middle of a pre-existing list", function () {
-      div = $("<div data-bind='foreachInit: data'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: data'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
               "</div>");
@@ -438,8 +438,8 @@ describe("foreachInit binding", function () {
     });
 
     it("deletes from the beginning", function () {
-      div = $("<div data-bind='foreachInit: data'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: data'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -451,8 +451,8 @@ describe("foreachInit binding", function () {
     });
 
     it("deletes from the beginning", function () {
-      div = $("<div data-bind='foreachInit: data'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: data'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -464,8 +464,8 @@ describe("foreachInit binding", function () {
     });
 
     it("combines multiple adds and deletes", function () {
-      div = $("<div data-bind='foreachInit: data'>" + 
-                "<i data-template data-bind='text: $data'></i>" + 
+      div = $("<div data-bind='foreachInit: data'>" +
+                "<i data-template data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
                 "<i data-init data-bind='text: $data'></i>" +
@@ -519,8 +519,8 @@ describe("foreachInit binding", function () {
     });
 
     it("accepts changes via a computed es5 property", function() {
-      var target = $("<div data-bind='foreachInit: list'>" + 
-                        "<i data-template data-bind='text: $data'></i>" + 
+      var target = $("<div data-bind='foreachInit: list'>" +
+                        "<i data-template data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
                         "<i data-init data-bind='text: $data'></i>" +
@@ -528,7 +528,7 @@ describe("foreachInit binding", function () {
 
       var list1 = [1, 2, 3];
       var list2 = [1, 2, 3, 4, 5, 6];
-      var es5Model = ko.track({ 
+      var es5Model = ko.track({
         toggle: true
       });
       ko.defineProperty(es5Model, "list", function () {
@@ -542,7 +542,7 @@ describe("foreachInit binding", function () {
 
  });
 
-  
+
   describe("combined with nested initializers", function () {
     var model;
 
@@ -551,7 +551,7 @@ describe("foreachInit binding", function () {
       model.push(new Models.CityViewModel());
       model.push(new Models.CityViewModel());
       model.push(new Models.CityViewModel());
-    }); 
+    });
 
     it("works with init", function () {
       var target = $("<div data-bind='foreachInit: $data'>" +
@@ -567,7 +567,7 @@ describe("foreachInit binding", function () {
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
-    }); 
+    });
 
     it("works with nested init", function () {
       var target = $("<ul data-bind='foreachInit: $data'>" +
@@ -583,7 +583,7 @@ describe("foreachInit binding", function () {
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
-    }); 
+    });
 
     it("works with init and text", function () {
       var target = $("<ul data-bind='foreachInit: $data'>" +
@@ -593,13 +593,13 @@ describe("foreachInit binding", function () {
                         "<li data-bind='init: name, text: name' data-init>Amsterdam</li>" +
                       "</ul>");
       ko.applyBindings(model, target[0]);
-      expect(target.html()).to.equal('<li data-bind="init: name, text: name" data-init="">London</li>' + 
+      expect(target.html()).to.equal('<li data-bind="init: name, text: name" data-init="">London</li>' +
                                      '<li data-bind="init: name, text: name" data-init="">Paris</li>' +
                                      '<li data-bind="init: name, text: name" data-init="">Amsterdam</li>');
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
-    }); 
+    });
 
     it("works with init and value", function () {
       var target = $("<div data-bind='foreachInit: $data'>" +
@@ -615,7 +615,7 @@ describe("foreachInit binding", function () {
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
-    }); 
+    });
 
     it("works with init and nested virtual element", function () {
       var target = $("<ul data-bind='foreachInit: $data'>" +
@@ -631,7 +631,7 @@ describe("foreachInit binding", function () {
       expect(model()[0].name()).to.equal('London');
       expect(model()[1].name()).to.equal('Paris');
       expect(model()[2].name()).to.equal('Amsterdam');
-    }); 
+    });
 
     it("works with init and template", function () {
       var target = $("<div data-bind='foreachInit: { name: \"tID2\", data: $data }'>" +
@@ -663,10 +663,10 @@ describe("foreachInit binding", function () {
                     "</ul>");
       var list = ['A', 'B', 'C'];
       ko.applyBindings(list, target[0]);
-      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span></li>' + 
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span></li>' +
                                      '<li data-init=""><span data-bind="text: $data">B</span></li>' +
                                      '<li data-init=""><span data-bind="text: $data">C</span></li>');
-    }); 
+    });
 
     it("with $index property", function () {
       var target = $("<ul data-bind='foreachInit: $data'>" +
@@ -677,7 +677,7 @@ describe("foreachInit binding", function () {
                     "</ul>");
       var list = ['A', 'B', 'C'];
       ko.applyBindings(list, target[0]);
-      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span><span data-bind="text: $index">0</span></li>' + 
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $data">A</span><span data-bind="text: $index">0</span></li>' +
                                      '<li data-init=""><span data-bind="text: $data">B</span><span data-bind="text: $index">1</span></li>' +
                                      '<li data-init=""><span data-bind="text: $data">C</span><span data-bind="text: $index">2</span></li>');
     });
@@ -696,10 +696,10 @@ describe("foreachInit binding", function () {
       model.cities.push(new Models.CityViewModel());
 
       ko.applyBindings(model, target[0]);
-      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' + 
-                                     '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' + 
+      expect(target.html()).to.equal('<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' +
+                                     '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>' +
                                      '<li data-init=""><span data-bind="text: $parent.city">New York</span></li>');
-    }); 
+    });
   });
 
 
@@ -708,8 +708,8 @@ describe("foreachInit binding", function () {
     var markup, model;
 
     beforeEach(function () {
-      markup = 
-        '<table>' + 
+      markup =
+        '<table>' +
             '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
               // Template with two rows.
               '<tr data-template>' +
@@ -721,44 +721,44 @@ describe("foreachInit binding", function () {
               '</tr>' +
 
               // First record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Bob</td>' +
                 '<td data-bind="init, text: lastname">Smith</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
               '</tr>' +
 
               // Second record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Edward</td>' +
                 '<td data-bind="init, text: lastname">Johnson</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
               '</tr>' +
 
               // Third record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Mike</td>' +
                 '<td data-bind="init, text: lastname">Michaels</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
               '</tr>' +
 
           '</tbody>'+
         '</table>';
 
-        model = { 
-            records: ko.observableArray(), 
-            createRecord: function (firstname, lastname, comment) { 
-                return { 
-                    firstname: ko.observable(firstname), 
-                    lastname: ko.observable(lastname), 
+        model = {
+            records: ko.observableArray(),
+            createRecord: function (firstname, lastname, comment) {
+                return {
+                    firstname: ko.observable(firstname),
+                    lastname: ko.observable(lastname),
                     comment: ko.observable(comment)
                 };
-            }     
+            }
         };
     });
 
@@ -766,7 +766,7 @@ describe("foreachInit binding", function () {
       var target = $(markup);
       ko.applyBindings(model, target[0]);
       expect(model.records().length).to.equal(3);
-    }); 
+    });
 
     it("creates the correct markup when adding new records.", function () {
       var target = $(markup);
@@ -775,36 +775,36 @@ describe("foreachInit binding", function () {
 
       expect(target.html()).to.equal(
             '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Bob</td>' +
                 '<td data-bind="init, text: lastname">Smith</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Edward</td>' +
                 '<td data-bind="init, text: lastname">Johnson</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Mike</td>' +
                 '<td data-bind="init, text: lastname">Michaels</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
               '</tr>' +
-              '<tr data-template="">' + 
+              '<tr data-template="">' +
                 '<td data-bind="text: firstname">Steve</td>' +
                 '<td data-bind="text: lastname">Rogers</td>' +
               '</tr>' +
-              '<tr data-template="">' + 
+              '<tr data-template="">' +
                 '<td colspan="2" data-bind="text: comment">Not actually Captain America</td>' +
               '</tr>' +
             '</tbody>');
-    }); 
+    });
 
     it("removes the correct markup when deleting records.", function () {
       var target = $(markup);
@@ -819,51 +819,51 @@ describe("foreachInit binding", function () {
 
       expect(target.html()).to.equal(
             '<tbody data-bind="foreachInit: { data: records, createElement: createRecord, nodesPerElement: 2 }">' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Edward</td>' +
                 '<td data-bind="init, text: lastname">Johnson</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Mike</td>' +
                 '<td data-bind="init, text: lastname">Michaels</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
               '</tr>' +
             '</tbody>');
-    }); 
+    });
 
     it("works with script tag templates", function() {
         var target = $(
-        '<table>' + 
+        '<table>' +
             '<tbody data-bind="foreachInit: { name: \'rowTemplate\', data: records, createElement: createRecord, nodesPerElement: 2 }">' +
               // First record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Bob</td>' +
                 '<td data-bind="init, text: lastname">Smith</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
               '</tr>' +
 
               // Second record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Edward</td>' +
                 '<td data-bind="init, text: lastname">Johnson</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
               '</tr>' +
 
               // Third record
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td data-bind="init, text: firstname">Mike</td>' +
                 '<td data-bind="init, text: lastname">Michaels</td>' +
               '</tr>' +
-              '<tr data-init>' + 
+              '<tr data-init>' +
                 '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
               '</tr>' +
           '</tbody>'+
@@ -878,44 +878,93 @@ describe("foreachInit binding", function () {
               '<td colspan="2" data-bind="text: comment"></td>' +
             '</tr>' +
           '</script>').appendTo(document.body);
-        
+
 
       ko.applyBindings(model, target[0]);
       model.records.push( model.createRecord('Steve', 'Rogers', 'Not actually Captain America') );
 
       expect(target.html()).to.equal(
             '<tbody data-bind="foreachInit: { name: \'rowTemplate\', data: records, createElement: createRecord, nodesPerElement: 2 }">' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Bob</td>' +
                 '<td data-bind="init, text: lastname">Smith</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Likes cheese</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Edward</td>' +
                 '<td data-bind="init, text: lastname">Johnson</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Invented weapons-grade gluten.</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td data-bind="init, text: firstname">Mike</td>' +
                 '<td data-bind="init, text: lastname">Michaels</td>' +
               '</tr>' +
-              '<tr data-init="">' + 
+              '<tr data-init="">' +
                 '<td colspan="2" data-bind="init, text: comment">Resents his parents for making his first name the same as his last.</td>' +
               '</tr>' +
-              '<tr>' + 
+              '<tr>' +
                 '<td data-bind="text: firstname">Steve</td>' +
                 '<td data-bind="text: lastname">Rogers</td>' +
               '</tr>' +
-              '<tr>' + 
+              '<tr>' +
                 '<td colspan="2" data-bind="text: comment">Not actually Captain America</td>' +
               '</tr>' +
             '</tbody>');
 
     });
+
+    it("works with repeating tables", function() {
+        var target = $(
+        '<div data-bind="foreachInit: { name: \'myTemplate\', data: records, createElement: createRecord }">' +
+            '<table data-init>' +
+                '<tbody>' +
+                  '<tr>' +
+                    '<td data-bind="init, text: firstname">Bob</td>' +
+                    '<td data-bind="init, text: lastname">Smith</td>' +
+                  '</tr>' +
+              '</tbody>'+
+            '</table>'+
+          '</div>');
+        var $template = $(
+          '<script type="text/ko-template" id="myTemplate">' +
+              '<table>' +
+                  '<tbody>' +
+                    '<tr>' +
+                      '<td data-bind="text: firstname">Bob</td>' +
+                      '<td data-bind="text: lastname">Smith</td>' +
+                    '</tr>' +
+                '</tbody>'+
+              '</table>'+
+          '</script>').appendTo(document.body);
+
+
+      ko.applyBindings(model, target[0]);
+      model.records.push( model.createRecord('Steve', 'Rogers', 'Not actually Captain America') );
+
+      expect(target.html()).to.equal(
+          '<table data-init="">' +
+              '<tbody>' +
+                '<tr>' +
+                  '<td data-bind="init, text: firstname">Bob</td>' +
+                  '<td data-bind="init, text: lastname">Smith</td>' +
+                '</tr>' +
+            '</tbody>'+
+          '</table>'+
+          '<table>' +
+              '<tbody>' +
+                '<tr>' +
+                  '<td data-bind="text: firstname">Steve</td>' +
+                  '<td data-bind="text: lastname">Rogers</td>' +
+                '</tr>' +
+            '</tbody>'+
+          '</table>');
+
+    });
+
 
   });
 });
