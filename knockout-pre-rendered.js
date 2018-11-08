@@ -78,10 +78,10 @@
       // For e.g. <template> tags
       parentNode = sourceNode.content;
     } else if (sourceNode.tagName === 'SCRIPT') {
-        if (sourceNode.innerHTML.match(/<tr[\s\S]*?<\/tr>/g) && !sourceNode.innerHTML.match(/<table[\s\S]*?<\/table>/g)) {
-            var tbl = document.createElement('table');
-            tbl.innerHTML = "<tbody>" + sourceNode.innerHTML + "</tbody>";
-            parentNode = tbl.firstChild;
+      if (sourceNode.innerHTML.match(/^\s*<tr[\s\S]*?<\/tr>\s*$/i)) {
+        var tbl = document.createElement('table');
+        tbl.innerHTML = "<tbody>" + sourceNode.innerHTML + "</tbody>";
+        parentNode = tbl.firstChild;
       }
       else {
         parentNode = document.createElement('div');
