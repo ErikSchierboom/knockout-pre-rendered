@@ -44,7 +44,7 @@
     "blanket": "^1.2.3",
     "chai": "^4.2.0",
     "coveralls": "^3.0.2",
-    "gulp": "^3.9.1",
+    "gulp": "github:gulpjs/gulp",
     "gulp-bump": "^3.1.1",
     "gulp-load-plugins": "^1.5.0",
     "gulp-mocha": "^6.0.0",

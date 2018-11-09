@@ -38,9 +38,9 @@ gulp.task('js', function () {
   gulp.src('./knockout-pre-rendered.d.ts')
       .pipe(gulp.dest('./dist'));
 
-  gulp.src('./knockout.d.ts')
+  return gulp.src('./knockout.d.ts')
       .pipe(gulp.dest('./dist'));
 });
 
-gulp.task('ci', ['js', 'test']);
-gulp.task('default', ['js']);
+gulp.task('ci', gulp.series('js', 'test'));
+gulp.task('default', gulp.series('js'));
