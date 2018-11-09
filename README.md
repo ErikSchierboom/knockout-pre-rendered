@@ -1,9 +1,13 @@
 # Knockout pre-rendered binding handlers
 
 [![Bower version](https://badge.fury.io/bo/knockout-pre-rendered.svg)](http://badge.fury.io/bo/knockout-pre-rendered)
+
 [![npm version](https://badge.fury.io/js/knockout-pre-rendered.svg)](http://badge.fury.io/js/knockout-pre-rendered)
+
 [![Build Status](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered.svg?branch=readme)](https://travis-ci.org/ErikSchierboom/knockout-pre-rendered)
+
 [![Build status](https://ci.appveyor.com/api/projects/status/b3mfjd4ofs9dsv1w?svg=true)](https://ci.appveyor.com/project/ErikSchierboom/knockout-pre-rendered)
+
 [![Coverage Status](https://coveralls.io/repos/ErikSchierboom/knockout-pre-rendered/badge.svg?branch=master&service=github)](https://coveralls.io/github/ErikSchierboom/knockout-pre-rendered?branch=master)
 
 This library adds two new binding handlers to Knockout that allow observables to be initialized from pre-rendered HTML content:
@@ -42,7 +46,9 @@ You can combine the `init` handler with any binding, as long as you ensure that 
 ```html
 <span data-bind="init, textInput: name">Michael Jordan</span>
 
-<!-- This binding will use the "value" attribute to initialize the observable -->
+<!--
+  This binding will use the "value" attribute to initialize the observable
+-->
 <input data-bind="init, value: name" value="Larry Bird" type="text" />
 ```
 
@@ -73,7 +79,9 @@ function CustomConvertViewModel() {
 You can then use this custom convert function as follows:
 
 ```html
-<span data-bind="init: { convert: parseDate }, text: dateOfBirth">February 17, 1963</span>
+<span data-bind="init: { convert: parseDate }, text: dateOfBirth"
+  >February 17, 1963</span
+>
 ```
 
 ### Virtual elements
@@ -81,13 +89,19 @@ You can then use this custom convert function as follows:
 You can also use the `init` binding handler as a virtual element:
 
 ```html
-<!-- ko init: { field: name } -->Michael Jordan<!-- /ko -->
+<!-- ko init: { field: name }
+-->Michael Jordan<!--
+  /ko
+-->
 ```
 
 Converting works the same as before:
 
 ```html
-<!-- ko init: { field: height, convert: parseInt } -->198<!-- /ko -->
+<!-- ko init: { field: height, convert: parseInt }
+-->198<!--
+  /ko
+-->
 ```
 
 Note that we now need to explicitly specify the `field` parameter, which points to the observable to initialize. In our previous examples, the `init` binding was able to infer this due to it being combined with the `text`, `textInput`, `value` or `checked` binding and using the observable they were pointing to. As a consequence, the following bindings are equivalent:
@@ -102,7 +116,9 @@ Note that we now need to explicitly specify the `field` parameter, which points 
 If you provide a `value` parameter to the `init` binding, that value will be used to initialize the observable instead:
 
 ```html
-<span data-bind="init: { field: name, value: 'Larry Bird' }, text: name">Michael Jordan</span>
+<span data-bind="init: { field: name, value: 'Larry Bird' }, text: name"
+  >Michael Jordan</span
+>
 ```
 
 This would result in the observable's value being set to `"Larry Bird"`, and thus the element's content is changed once the `text` binding is applied.
@@ -173,7 +189,7 @@ There are several things to note:
 You can also use a template that is defined elsewhere on the page:
 
 ```html
-<ul data-bind="foreachInit: { name: 'personTemplate', data: persons }">  
+<ul data-bind="foreachInit: { name: 'personTemplate', data: persons }">
   <li data-bind="init, text: name">Michael Jordan</li>
   <li data-bind="init, text: name">Larry Bird</li>
   <li data-bind="init, text: name">Magic Johnson</li>
@@ -181,6 +197,7 @@ You can also use a template that is defined elsewhere on the page:
 
 <script type="text/ko-template" id="personTemplate">
   <li data-bind="text: name"></li>
+
 </script>
 ```
 
@@ -207,7 +224,7 @@ Note that the `persons` observable array does not contain any elements, but that
 We can use the `foreachInit` binding handler as follows:
 
 ```html
-<ul data-bind="foreachInit: { data: persons, createElement: createPerson }">  
+<ul data-bind="foreachInit: { data: persons, createElement: createPerson }">
   <li data-template data-bind="text: name"></li>
   <li data-init data-bind="init, text: name">Michael Jordan</li>
   <li data-init data-bind="init, text: name">Larry Bird</li>
@@ -232,7 +249,9 @@ function ForeachDynamicViewModel() {
 The `foreachInit` binding does not immediately process changes. Instead, it queues all changes, which it then later processes all at once. If you want to do additional processing before or after each queue processing round, you can use the `dataChanged`, `beforeQueueFlush` and `afterQueueFlush` attributes:
 
 ```html
-<ul data-bind="foreachInit: { data: persons, dataChanged: dataChanged, beforeQueueFlush: beforeQueue, afterQueueFlush: afterQueue }">  
+<ul
+  data-bind="foreachInit: { data: persons, dataChanged: dataChanged, beforeQueueFlush: beforeQueue, afterQueueFlush: afterQueue }"
+>
   <li data-template data-bind="text: name"></li>
 </ul>
 ```
@@ -306,6 +325,13 @@ There is a JSBin demo for each of the binding handlers:
      <th>Date</th>
      <th>Version</th>
      <th>Changes</th>
+  </tr>
+  <tr>
+     <td>2018-11-09</td>
+     <td>0.10.1</td>
+     <td>
+        Fix for repeating tables. (by <a href="https://github.com/penguinstampede">penguinstampede</a>).
+      </td>
   </tr>
   <tr>
      <td>2018-06-23</td>

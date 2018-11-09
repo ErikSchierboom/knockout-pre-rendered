@@ -1,6 +1,6 @@
 {
   "name": "knockout-pre-rendered",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Knockout pre-rendered",
   "main": "dist/knockout-pre-rendered.js",
   "typings": "./dist/knockout-pre-rendered.d.ts",
@@ -14,6 +14,10 @@
   ],
   "scripts": {
     "test": "gulp test",
+    "build": "gulp ci",
+    "patch": "gulp patch",
+    "feature": "gulp feature",
+    "release": "gulp release",
     "coverage": "mocha --require blanket -R html-cov > coverage/coverage.html",
     "coveralls": "mocha --require blanket -R mocha-lcov-reporter > coverage/coverage.lcov"
   },
