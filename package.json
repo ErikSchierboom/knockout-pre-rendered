@@ -13,7 +13,7 @@
     "dist"
   ],
   "scripts": {
-    "ci": "npm run test && npm run build",
+    "ci": "npm run format:verify && npm run test && npm run build",
     "build": "cpx 'knockout*.{js,ts}' dist/ && replace '{{ version }}' $npm_package_version dist/knockout-pre-rendered.js && uglifyjs dist/knockout-pre-rendered.js -o dist/knockout-pre-rendered.min.js",
     "test": "mocha test/spec.js",
     "coverage": "mocha --require blanket -R html-cov > coverage/coverage.html",
