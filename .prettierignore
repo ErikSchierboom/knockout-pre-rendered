@@ -1,0 +1,5 @@
+package.json
+package-lock.json
+dist/
+bower_components/
+.wwp-cache

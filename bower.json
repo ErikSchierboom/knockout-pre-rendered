@@ -2,9 +2,7 @@
   "name": "knockout-pre-rendered",
   "main": "dist/knockout-pre-rendered.js",
   "homepage": "https://github.com/ErikSchierboom/knockout-pre-rendered",
-  "authors": [
-    "Erik Schierboom <erik_schierboom@hotmail.com>"
-  ],
+  "authors": ["Erik Schierboom <erik_schierboom@hotmail.com>"],
   "description": "Adds binding handlers to Knockout (KO) that are initialized using pre-rendered content (HTML).",
   "keywords": [
     "knockout",
@@ -14,10 +12,7 @@
     "javascript"
   ],
   "license": "Apache-2.0",
-  "ignore": [
-    "*",
-    "!dist/*"
-  ],
+  "ignore": ["*", "!dist/*"],
   "dependencies": {
     "knockout": "^3.2.0"
   }

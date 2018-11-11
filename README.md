@@ -197,7 +197,6 @@ You can also use a template that is defined elsewhere on the page:
 
 <script type="text/ko-template" id="personTemplate">
   <li data-bind="text: name"></li>
-
 </script>
 ```
 

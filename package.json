@@ -19,7 +19,9 @@
     "feature": "gulp feature",
     "release": "gulp release",
     "coverage": "mocha --require blanket -R html-cov > coverage/coverage.html",
-    "coveralls": "mocha --require blanket -R mocha-lcov-reporter > coverage/coverage.lcov"
+    "coveralls": "mocha --require blanket -R mocha-lcov-reporter > coverage/coverage.lcov",
+    "format": "prettier --write '**/*.{js,jsx,ts,tsx,json,md,css,scss}'",
+    "format:verify": "prettier --list-different '**/*.{js,jsx,ts,tsx,json,md,css,scss}'"
   },
   "repository": {
     "type": "git",
