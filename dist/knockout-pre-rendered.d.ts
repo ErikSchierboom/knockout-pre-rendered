@@ -6,6 +6,6 @@
 /// <reference path="./knockout.d.ts" />
 
 interface KnockoutBindingHandlers {
-    init: KnockoutBindingHandler;
-    foreachInit: KnockoutBindingHandler;
+  init: KnockoutBindingHandler;
+  foreachInit: KnockoutBindingHandler;
 }
