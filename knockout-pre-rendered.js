@@ -586,12 +586,6 @@
     return allBindings.get("attr");
   }
 
-  function getValueElement(element) {
-    return isVirtualNode(element)
-      ? ko.virtualElements.firstChild(element)
-      : element;
-  }
-
   function initAttributeObservables(element, value, allBindings) {
     var valueElement = isVirtualNode(element)
       ? ko.virtualElements.firstChild(element)
