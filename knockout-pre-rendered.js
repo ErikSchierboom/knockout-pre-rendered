@@ -160,11 +160,16 @@
   // KO's built-in "_twoWayBindings" logic can only carry us so far. For other bindings,
   // we need to generate our own property writers, in much the same way as KO does.
 
-  // Generate property writers for all properties referenced in an "attr" binding.
+  // Generate property writers for all properties referenced in "attr" and "css" bindings.
   generatePropertyWritersForBinding(
     "attr",
     "_ko_prerender_attrPropertyWriters",
     "attr"
+  );
+  generatePropertyWritersForBinding(
+    "css",
+    "_ko_prerender_cssPropertyWriters",
+    "css"
   );
 
   // This method generates a binding preprocessor for the specified binding, and for each
@@ -582,134 +587,215 @@
     }
   }
 
-  function hasAttributeBinding(allBindings) {
-    return allBindings.get("attr");
+  // Extend single-value bindings.
+
+  extendBindingInit("value");
+  extendBindingInit("text");
+  extendBindingInit("textInput");
+  extendBindingInit("checked", function(element) {
+    return element.checked;
+  });
+  extendBindingInit("visible", function(element) {
+    return !elementIsHidden(element);
+  });
+  extendBindingInit("html", function(element) {
+    return element.innerHTML;
+  });
+  extendBindingInit("enable", function(element) {
+    return !element.disabled;
+  });
+  extendBindingInit("disable", function(element) {
+    return element.disabled;
+  });
+
+  // Extend multi-value bindings.
+
+  extendBindingInit(
+    "attr",
+    function(element, name) {
+      return element.attributes[name]
+        ? element.attributes[name].value
+        : undefined;
+    },
+    true,
+    "_ko_prerender_attrPropertyWriters"
+  );
+  extendBindingInit(
+    "css",
+    function(element, name) {
+      return new RegExp("\\b" + name + "\\b", "i").test(element.className);
+    },
+    true,
+    "_ko_prerender_cssPropertyWriters"
+  );
+
+  function defaultMarkupReader(element) {
+    return element.innerText || element.textContent || element.value;
   }
 
-  function initAttributeObservables(element, value, allBindings) {
-    var valueElement = isVirtualNode(element)
-      ? ko.virtualElements.firstChild(element)
-      : element;
-    var fieldValue = allBindings.get("attr");
+  // Extends the "init" method of a binding handler, to extract the existing value from the markup and write it to the view model before running the normal init logic.
+  function extendBindingInit(
+    bindingName,
+    markupReader,
+    isMultiValue,
+    propertyWritersBindingName
+  ) {
+    // Default arguments
+    markupReader = markupReader || defaultMarkupReader;
+    propertyWritersBindingName =
+      propertyWritersBindingName ||
+      (ko.expressionRewriting._twoWayBindings[bindingName]
+        ? "_ko_property_writers"
+        : undefined);
 
-    for (var attribute in fieldValue) {
-      if (fieldValue.hasOwnProperty(attribute)) {
-        if (valueElement.attributes[attribute] === undefined) {
-          continue;
-        }
+    var bindingHandler = ko.bindingHandlers[bindingName];
+    var existingInit = bindingHandler.init;
 
-        var attributeValue = valueElement.attributes[attribute].value;
+    bindingHandler.init = function(
+      element,
+      valueAccessor,
+      allBindings,
+      viewModel
+    ) {
+      // Look for an init binding.
+      var initBinding = allBindings.get("init");
+      if (initBinding) {
+        var convert = initBinding["convert"];
 
-        // If a convert function was passed, apply it to the field value.
-        // This can be used to convert the input string to the correct field value
-        if (isPlainObject(value) && typeof value["convert"] === "function") {
-          attributeValue = value["convert"](attributeValue);
-        }
+        if (!isMultiValue) {
+          // Single-value binding.
+          var valueFromMarkup = markupReader(element);
 
-        // First try to write to the value as an observable.
-        if (ko.isObservable(fieldValue[attribute])) {
-          fieldValue[attribute](attributeValue);
+          // If the init binding is bound to its own field but does not also specify its own value...
+          if (
+            hasFieldOverride(initBinding) &&
+            !initBinding.hasOwnProperty("value")
+          ) {
+            // Then write the value to the init field instead.
+            writeValueToModel(
+              valueFromMarkup,
+              initBinding.hasOwnProperty("field")
+                ? initBinding["field"]
+                : initBinding,
+              convert,
+              "field",
+              allBindings,
+              "_ko_prerender_initPropertyWriters"
+            );
+          } else {
+            // Otherwise write the value to the model as normal.
+            writeValueToModel(
+              valueFromMarkup,
+              valueAccessor(),
+              convert,
+              bindingName,
+              allBindings,
+              propertyWritersBindingName
+            );
+          }
         } else {
-          // Otherwise, look for a suitable attribute property writer.
-          var writers = allBindings.get("_ko_prerender_attrPropertyWriters");
-          if (writers && writers[attribute]) {
-            writers[attribute](attributeValue);
+          // For a multi-value binding, loop through its properties, read the markup for each key, and write to the model.
+          var props = valueAccessor();
+          for (var key in props) {
+            var valueFromMarkup = markupReader(element, key);
+            writeValueToModel(
+              valueFromMarkup,
+              props[key],
+              convert,
+              key,
+              allBindings,
+              propertyWritersBindingName
+            );
           }
         }
       }
-    }
+      // Now call the original "init" method.
+      if (existingInit) {
+        existingInit.apply(this, arguments);
+      }
+    };
   }
 
-  function initObservable(element, value, allBindings) {
-    // Determine the element from which to retrieve the value
-    var valueElement = isVirtualNode(element)
-      ? ko.virtualElements.firstChild(element)
-      : element;
-    var unwrappedValue = ko.utils.peekObservable(value);
-
-    // Get the actual value from the element. If the binding handler does not
-    // have an explicit value, try to retrieve it from the value of inner text content
-    var fieldValue =
-      isPlainObject(value) && value["value"] !== undefined
-        ? value["value"]
-        : allBindings.get("checked")
-        ? valueElement.checked
-        : allBindings.get("visible")
-        ? !elementIsHidden(valueElement)
-        : allBindings.get("html")
-        ? valueElement.innerHTML
-        : allBindings.get("enable")
-        ? !valueElement.disabled
-        : allBindings.get("disable")
-        ? valueElement.disabled
-        : valueElement.innerText ||
-          valueElement.textContent ||
-          valueElement.value;
-
-    // If a convert function was passed, apply it to the field value.
-    // This can be used to convert the input string to the correct field value
-    if (isPlainObject(value) && typeof value["convert"] === "function") {
-      fieldValue = value["convert"](fieldValue);
-    }
-
-    // Look for property writers for explicit fields in the init binding.
-    var initPropertyWriters =
-      allBindings.get("_ko_prerender_initPropertyWriters") || {};
-    // Look for property writers from knockout's built-in two-way bindings
-    var propertyWriters = allBindings.get("_ko_property_writers") || {};
-
-    // Find the field accessor. If the init binding does not point to an observable
-    // or the field parameter doesn't, we try the text and value binding
-    var fieldAccessor =
-      !value && "field" in initPropertyWriters
-        ? initPropertyWriters["field"]
-        : ko.isObservable(value)
-        ? value
-        : isPlainObject(value) && "field" in value
-        ? ko.isObservable(value["field"])
-          ? value["field"]
-          : initPropertyWriters["field"]
-        : undefined;
-
-    if (!fieldAccessor) {
-      var supportedBindings = [
-        "text",
-        "textInput",
-        "value",
-        "checked",
-        "html",
-        "visible",
-        "enable",
-        "disable"
-      ];
-      for (var i = 0; i < supportedBindings.length && !fieldAccessor; i++) {
-        var bindingName = supportedBindings[i];
-        var accessor = allBindings.get(bindingName);
-        if (accessor && ko.isObservable(accessor)) {
-          fieldAccessor = accessor;
-        } else if (bindingName in propertyWriters) {
-          fieldAccessor = propertyWriters[bindingName];
-        }
+  function writeValueToModel(
+    value,
+    fieldAccessor,
+    convert,
+    key,
+    allBindings,
+    propertyWritersBindingName
+  ) {
+    if (convert) {
+      var conversion = convert.hasOwnProperty(key) ? convert[key] : convert;
+      if (conversion instanceof Function) {
+        value = conversion(value);
       }
     }
 
-    // Finally, set the field value.
-    if (fieldAccessor) {
-      fieldAccessor(fieldValue, unwrappedValue);
+    if (ko.isObservable(fieldAccessor)) {
+      fieldAccessor(value, ko.unwrap(fieldAccessor));
+    } else {
+      var propertyWriter = getPropertyWriter(
+        allBindings,
+        propertyWritersBindingName,
+        key
+      );
+      if (propertyWriter) {
+        propertyWriter(value);
+      }
     }
+  }
+  
+  function getPropertyWriter(allBindings, propertyWritersBindingName, key) {
+    if (propertyWritersBindingName) {
+      var propertyWriters = allBindings.get(propertyWritersBindingName);
+      if (propertyWriters) {
+        return propertyWriters[key];
+      }
+    }
+    return null;
+  }
+
+  // Returns true if the init binding specifies a field in which to write values extracted from the markup.
+  function hasFieldOverride(initBinding) {
+    if (isPlainObject(initBinding)) {
+      // init: { field: fieldName }
+      if (initBinding.hasOwnProperty("field")) {
+        return true;
+      }
+    } else if (initBinding !== true) {
+      // init: fieldName
+      return true;
+    }
+    return false;
   }
 
   // This binding handler initializes an observable to a value from the HTML element
   ko.bindingHandlers.init = {
     init: function(element, valueAccessor, allBindings, viewModel) {
-      var value = valueAccessor();
+      var initBinding = valueAccessor();
 
-      if (isObjectWithExplicitValues(value)) {
-        setExplicitObjectValues(value, viewModel, allBindings);
-      } else if (hasAttributeBinding(allBindings)) {
-        initAttributeObservables(element, value, allBindings);
-      } else {
-        initObservable(element, value, allBindings);
+      if (isObjectWithExplicitValues(initBinding)) {
+        setExplicitObjectValues(initBinding, viewModel, allBindings);
+      }
+
+      if (initBinding !== true) {
+        var valueElement = isVirtualNode(element)
+          ? ko.virtualElements.firstChild(element)
+          : element;
+        var value = initBinding.hasOwnProperty("value")
+          ? initBinding["value"]
+          : defaultMarkupReader(valueElement);
+
+        writeValueToModel(
+          value,
+          initBinding.hasOwnProperty("field")
+            ? initBinding["field"]
+            : initBinding,
+          initBinding["convert"],
+          "field",
+          allBindings,
+          "_ko_prerender_initPropertyWriters"
+        );
       }
     }
   };
