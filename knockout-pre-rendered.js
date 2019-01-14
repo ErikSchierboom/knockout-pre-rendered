@@ -744,7 +744,7 @@
       }
     }
   }
-  
+
   function getPropertyWriter(allBindings, propertyWritersBindingName, key) {
     if (propertyWritersBindingName) {
       var propertyWriters = allBindings.get(propertyWritersBindingName);
