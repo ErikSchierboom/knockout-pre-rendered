@@ -759,14 +759,10 @@
   function hasFieldOverride(initBinding) {
     if (isPlainObject(initBinding)) {
       // init: { field: fieldName }
-      if (initBinding.hasOwnProperty("field")) {
-        return true;
-      }
-    } else if (initBinding !== true) {
-      // init: fieldName
-      return true;
+      return initBinding.hasOwnProperty("field");
     }
-    return false;
+    // init: fieldName
+    return initBinding !== true;
   }
 
   // This binding handler initializes an observable to a value from the HTML element
@@ -774,29 +770,30 @@
     init: function(element, valueAccessor, allBindings, viewModel) {
       var initBinding = valueAccessor();
 
+      if (initBinding === true) {
+        return;
+      }
+
       if (isObjectWithExplicitValues(initBinding)) {
         setExplicitObjectValues(initBinding, viewModel, allBindings);
       }
 
-      if (initBinding !== true) {
-        var valueElement = isVirtualNode(element)
-          ? ko.virtualElements.firstChild(element)
-          : element;
-        var value = initBinding.hasOwnProperty("value")
-          ? initBinding["value"]
-          : defaultMarkupReader(valueElement);
-
-        writeValueToModel(
-          value,
-          initBinding.hasOwnProperty("field")
-            ? initBinding["field"]
-            : initBinding,
-          initBinding["convert"],
-          "field",
-          allBindings,
-          "_ko_prerender_initPropertyWriters"
-        );
-      }
+      var valueElement = isVirtualNode(element)
+        ? ko.virtualElements.firstChild(element)
+        : element;
+      var value = initBinding.hasOwnProperty("value")
+        ? initBinding["value"]
+        : defaultMarkupReader(valueElement);
+      writeValueToModel(
+        value,
+        initBinding.hasOwnProperty("field")
+          ? initBinding["field"]
+          : initBinding,
+        initBinding["convert"],
+        "field",
+        allBindings,
+        "_ko_prerender_initPropertyWriters"
+      );
     }
   };
 
