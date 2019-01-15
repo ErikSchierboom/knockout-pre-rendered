@@ -180,6 +180,30 @@ describe("init binding", function() {
     expect(model.year).to.equal(230);
   });
 
+  it("works with multiple bindings", function() {
+    var target = $(
+      "<input data-bind='init, text: city, disable: visited, attr: { title: year }' type='text' title='2019' value='London' disabled />"
+    );
+    var model = new Models.ViewModel();
+    ko.applyBindings(model, target[0]);
+    expect($(target).val()).to.equal("London");
+    expect(model.city()).to.equal("London");
+    expect(model.year()).to.equal("2019");
+    expect(model.visited()).to.be.true;
+  });
+
+  it("works with multiple bindings, with separate convert functions.", function() {
+    var target = $(
+      "<input data-bind='init: { convert: { text: toUpperCase, title: parseInt }}, text: city, disable: visited, attr: { title: year }' type='text' title='2019' value='London' disabled />"
+    );
+    var model = new Models.ViewModel();
+    ko.applyBindings(model, target[0]);
+    expect($(target).val()).to.equal("London");
+    expect(model.city()).to.equal("LONDON");
+    expect(model.year()).to.equal(2019);
+    expect(model.visited()).to.be.true;
+  });
+
   describe("combined with text binding", function() {
     it("works with an observable", function() {
       var target = $("<span data-bind='init, text: city'>London</span>");
@@ -1047,6 +1071,126 @@ describe("init binding", function() {
       model.linkTitle = "Visit GitHub!";
       expect($(target).attr("href")).to.equal("http://github.com");
       expect($(target).attr("title")).to.equal("Visit GitHub!");
+    });
+
+    it("works with multiple attributes, each with their own convert function.", function() {
+      var target = $(
+        "<a data-bind='init: { convert: { href: toUpperCase, title: toLowerCase } }, attr: { href: link, title: linkTitle }' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.link()).to.equal("HTTP://WWW.GOOGLE.COM");
+      expect(model.linkTitle()).to.equal("visit google.com");
+    });
+  });
+
+  describe("combined with css binding", function() {
+    it("works with an observable", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited }' class='vlink' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited()).to.equal(true);
+    });
+
+    it("works with a plain JS property", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited }' class='vlink' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited).to.equal(true);
+    });
+
+    it("works with a computed", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visitedComputed }' class='vlink' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visitedComputed()).to.equal(true);
+    });
+
+    it("ignores field attribute", function() {
+      var target = $(
+        "<a data-bind='init: { field: city }, css: { vlink: visited }' class='vlink' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited()).to.equal(true);
+    });
+
+    it("recognizes missing class", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited }' class='someOtherClass' href='http://www.google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited()).to.equal(false);
+    });
+
+    it("works with convert attribute", function() {
+      var target = $(
+        "<a data-bind='init: { convert: negate }, css: { vlink: visited }' class='vlink' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited()).to.equal(false);
+    });
+
+    it("works with multiple classes", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited, ext: external }' class='vlink ext' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited()).to.equal(true);
+      expect(model.external()).to.equal(true);
+    });
+
+    it("works with multiple classes with a plain JS model", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited, ext: external }' class='vlink ext' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.PlainJSModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited).to.equal(true);
+      expect(model.external).to.equal(true);
+    });
+
+    it("works with multiple classes with a reactive ES5 model", function() {
+      var target = $(
+        "<a data-bind='init, css: { vlink: visited, ext: external }' class='vlink ext' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.Es5TrackedModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.visited).to.equal(true);
+      expect(model.external).to.equal(true);
+      model.visited = false;
+      model.external = false;
+      expect($(target).attr("class")).to.equal("");
+    });
+
+    it("works with multiple classes, each with their own convert function.", function() {
+      var target = $(
+        "<a data-bind='init: { convert: { href: toUpperCase, title: toLowerCase } }, attr: { href: link, title: linkTitle }' href='http://www.google.com' title='Visit Google.com'>Google</a>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect($(target).text()).to.equal("Google");
+      expect(model.link()).to.equal("HTTP://WWW.GOOGLE.COM");
+      expect(model.linkTitle()).to.equal("visit google.com");
     });
   });
 });

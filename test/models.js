@@ -36,12 +36,18 @@ Models.ViewModel = function() {
     }
   });
 
+  self.external = ko.observable(false);
+
   self.createCity = function() {
     return new Models.CityViewModel();
   };
 
   self.toUpperCase = function(str) {
     return str.toUpperCase();
+  };
+
+  self.toLowerCase = function(str) {
+    return str.toLowerCase();
   };
 
   self.negate = function(bool) {
@@ -57,6 +63,8 @@ Models.PlainJSModel = function() {
   self.link = "";
   self.linkTitle = "";
   self.year = 0;
+  self.visited = false;
+  self.external = false;
 };
 
 Models.Es5TrackedModel = function() {
@@ -67,7 +75,8 @@ Models.Es5TrackedModel = function() {
   self.link = "";
   self.linkTitle = "";
   self.year = 0;
-
+  self.visited = false;
+  self.external = false;
   ko.track(self);
 };
 
