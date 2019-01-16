@@ -1,6 +1,6 @@
 /*!
-  Knockout pre-rendered binding handlers v0.10.1
-  By: Erik Schierboom (C) 2015
+  Knockout pre-rendered binding handlers v$npm_package_version
+  By: Erik Schierboom (C) 2019
   License: Apache 2
 
   Adds binding handlers that can be populated based on existing HTML.

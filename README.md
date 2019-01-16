@@ -326,6 +326,13 @@ There is a JSBin demo for each of the binding handlers:
      <th>Changes</th>
   </tr>
   <tr>
+     <td>2019-01-16</td>
+     <td>0.11.0</td>
+     <td>
+        Support multiple bindings on a single element. (by <a href="https://github.com/revengineering">revengineering</a>).
+      </td>
+  </tr>
+  <tr>
      <td>2018-11-09</td>
      <td>0.10.1</td>
      <td>

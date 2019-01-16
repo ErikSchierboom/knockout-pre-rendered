@@ -1,6 +1,6 @@
 /*!
   Knockout pre-rendered binding handlers v{{ version }}
-  By: Erik Schierboom (C) 2015
+  By: Erik Schierboom (C) 2019
   License: Apache 2
 
   Adds binding handlers that can be populated based on existing HTML.
