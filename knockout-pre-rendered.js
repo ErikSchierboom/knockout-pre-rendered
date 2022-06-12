@@ -593,6 +593,8 @@
   extendBindingInit("text");
   extendBindingInit("textInput");
   extendBindingInit("checked", function(element) {
+	  if(element.type == 'radio')
+		  return element.value;
     return element.checked;
   });
   extendBindingInit("visible", function(element) {
@@ -690,7 +692,8 @@
               convert,
               bindingName,
               allBindings,
-              propertyWritersBindingName
+              propertyWritersBindingName,
+			        element.type =='radio' && !element.checked
             );
           }
         } else {
@@ -722,7 +725,8 @@
     convert,
     key,
     allBindings,
-    propertyWritersBindingName
+    propertyWritersBindingName,
+	  shouldIgnore
   ) {
     if (convert) {
       var conversion = convert.hasOwnProperty(key) ? convert[key] : convert;
@@ -732,7 +736,9 @@
     }
 
     if (ko.isObservable(fieldAccessor)) {
-      fieldAccessor(value, ko.unwrap(fieldAccessor));
+	      if(!shouldIgnore)
+		         fieldAccessor(value, ko.unwrap(fieldAccessor));
+
     } else {
       var propertyWriter = getPropertyWriter(
         allBindings,
