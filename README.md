@@ -144,7 +144,7 @@ The `init` binding can be used with the following bindings:
 - `value`: the value is set to the bound element's value.
 - `html`: the value is set to the bound element's inner HTML value.
 - `attr`: the bound attribute properties are set to their respective attribute values.
-- `checked`: the value is set to the bound element's checked value.
+- `checked`: the value is set to the bound element's checked value of both checkbox and radio inputs.
 - `visible`: the value is set to `true` or `false` depending on the bound element's visibility.
 - `enable`: the value is set to `true` if the bound element does not have a `disabled` attribute; otherwise, it is set to `false`.
 - `disable`: the value is set to `true` if the bound element has a `disabled` attribute; otherwise, it is set to `true`.
@@ -311,7 +311,8 @@ There is a JSBin demo for each of the binding handlers:
 - [`init` with value binding](http://jsbin.com/xuluye/)
 - [`init` with html binding](http://jsbin.com/wilahi/)
 - [`init` with attr binding](http://jsbin.com/zehivi/)
-- [`init` with checked binding](http://jsbin.com/zemode/)
+- [`init` with checked binding for checkbox](http://jsbin.com/zemode/)
+- [`init` with checked binding for radio](http://jsbin.com/pumodetaqu/)
 - [`init` with visible binding](http://jsbin.com/vufufa/)
 - [`init` with enable binding](http://jsbin.com/moxoji/)
 - [`init` with disable binding](http://jsbin.com/bonapi/)

@@ -465,6 +465,24 @@ describe("init binding", function() {
       expect($(target).attr("checked")).to.equal(undefined);
       expect(model.visited()).to.be.false;
     });
+
+    it("works with unchecked radio buttons", function() {
+      var target = $(
+        "<input data-bind='init, checked: city' type='radio' value='Chennai' />"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect(model.city()).to.equal('');
+    });
+
+    it("works with checked radio buttons", function() {
+      var target = $(
+        "<input data-bind='init, checked: city' type='radio' value='Chennai' checked/>"
+      );
+      var model = new Models.ViewModel();
+      ko.applyBindings(model, target[0]);
+      expect(model.city()).to.equal('Chennai');
+    });
   });
 
   describe("combined with visible binding", function() {
